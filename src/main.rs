@@ -1,8 +1,9 @@
-use ndarray::{Array, Array1, Array2};
+use ndarray::{Array, Array1, Array2, Dimension};
 use rand::{Rng, prelude::SliceRandom};
 
 
-fn sigmoid(z: Array2<f64>) -> Array2<f64>{
+fn sigmoid<D>(z: Array<f64, D>) -> Array<f64, D>
+where D: Dimension{
     let mut z = z;
     z.iter_mut().for_each(|f|  *f = 1.0/(1.0 + (-*f).exp()));
     z
@@ -59,9 +60,26 @@ impl Network {
             training_data.shuffle(&mut rng);
             let mut mini_batches = training_data.windows(mini_batch_size).step_by(mini_batch_size).map(|s| s.to_vec()).collect::<Vec<Vec<_>>>();
             for mut mini_batch in &mut mini_batches{
-                self.update_mini_batch(&mut mini_batch, eta)
+                //self.update_mini_batch(&mut mini_batch, eta)
             }
         }
+    }
+
+    fn backprop(&self, x: Array1<f64>, y: Array1<f64>){
+        let nabla_b = self.biases.iter().map(|b| Array::zeros(b.raw_dim())).collect::<Vec<Array1<f64>>>();
+        let nabla_w = self.weights.iter().map(|w| Array::zeros(w.raw_dim())).collect::<Vec<Array2<f64>>>();
+
+        let mut activation = x.clone();
+        let mut activations = vec![x];
+        let mut zs: Vec<Array1<f64>>= Vec::new();
+
+        for (b,w) in self.biases.iter().zip(self.weights.iter()){
+            let z = w.dot(&activation) + b;
+            zs.push(z.clone());
+            activation = sigmoid(z);
+            activations.push(activation.clone());
+        }
+
     }
 }
 
@@ -69,4 +87,7 @@ fn main() {
     println!("Hello, world!");
     let x = Network::new(vec![2, 5, 6, 4]);
     dbg!(x);
+
+    //let x =  Array::from_elem((1000,1000, 100), 1.);
+    //dbg!(sigmoid(x));
 }
