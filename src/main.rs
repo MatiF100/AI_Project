@@ -1,6 +1,8 @@
 use ndarray::{arr2, Array, Array2, Dimension};
 use rand::{prelude::SliceRandom, Rng};
 
+mod data;
+
 fn sigmoid<D>(z: Array<f64, D>) -> Array<f64, D>
 where
     D: Dimension,
@@ -159,9 +161,9 @@ impl Network {
             let x = nabla_w
                 .iter()
                 .zip(delta_nabla_w.iter())
-                .map(|(nw, dnw)|  nw + dnw)
+                .map(|(nw, dnw)| nw + dnw)
                 .collect();
-                nabla_w = x
+            nabla_w = x
         }
 
         self.weights = self
@@ -206,34 +208,75 @@ impl Network {
 
 fn main() {
     println!("Hello, world!");
-    let mut x = Network::new(vec![2,2]);
+    let mut x = Network::new(vec![16, 1, 1, 8]);
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
     //Vector for learning data - added manually ATM
     let mut t_data: Vec<(Array2<f64>, Array2<f64>)> = Vec::new();
     //Vector for validation data - added manually ATM
     let mut v_data: Vec<Array2<f64>> = Vec::new();
+    
+    let data = std::fs::read_to_string("zoo.data");
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = animal_list.iter().map(|a| a.into_training_arr2()).collect::<Vec<_>>();
+    t_data = animal_list;
 
     //Adding learning data
-    t_data.push((arr2(&[[0.0, 0.0]]).t().to_owned(), arr2(&[[0.0, 1.0]]).t().to_owned()));
-    t_data.push((arr2(&[[0.0, 1.0]]).t().to_owned(), arr2(&[[1.0, 0.0]]).t().to_owned()));
-    t_data.push((arr2(&[[1.0, 0.0]]).t().to_owned(), arr2(&[[1.0, 0.0]]).t().to_owned()));
-    t_data.push((arr2(&[[1.0, 1.0]]).t().to_owned(), arr2(&[[1.0, 0.0]]).t().to_owned()));
+    /*
+    t_data.push((
+        arr2(&[[0.0, 0.0]]).t().to_owned(),
+        arr2(&[[0.0, 1.0]]).t().to_owned(),
+    ));
+    t_data.push((
+        arr2(&[[0.0, 1.0]]).t().to_owned(),
+        arr2(&[[1.0, 0.0]]).t().to_owned(),
+    ));
+    t_data.push((
+        arr2(&[[1.0, 0.0]]).t().to_owned(),
+        arr2(&[[1.0, 0.0]]).t().to_owned(),
+    ));
+    t_data.push((
+        arr2(&[[1.0, 1.0]]).t().to_owned(),
+        arr2(&[[0.0, 1.0]]).t().to_owned(),
+    ));
+    */
 
-//    dbg!(&t_data);
-    x.sgd(&mut t_data, 500, 4, 20.0, None);
+    v_data.push(t_data[0].0.clone());
+    v_data.push(t_data[2].0.clone());
+    v_data.push(t_data[6].0.clone());
+    v_data.push(t_data[9].0.clone());
+    v_data.push(t_data[15].0.clone());
+    v_data.push(t_data[26].0.clone());
+    v_data.push(t_data[12].0.clone());
+    v_data.push(t_data[14].0.clone());
+
+    //    dbg!(&t_data);
+    let data_len = t_data.len();
+    x.sgd(&mut t_data, 5000, data_len, 0.10, None);
+
 
     //Adding validation data
+    /*
     v_data.push(arr2(&[[0.0, 0.0]]).t().to_owned());
     v_data.push(arr2(&[[0.0, 1.0]]).t().to_owned());
     v_data.push(arr2(&[[1.0, 0.0]]).t().to_owned());
     v_data.push(arr2(&[[1.0, 1.0]]).t().to_owned());
     v_data.push(arr2(&[[0.5, 0.7]]).t().to_owned());
+    */
 
-    for record in &v_data{
-        let result = x.feed_forward(record.clone());
-        println!("For input data: X1: {}, X2: {}, network has outputted: Y1: {}, Y2: {}", &record[[0,0]], &record[[1,0]], &result[[0,0]], &result[[1,0]]);
+    for record in v_data.iter().enumerate() {
+        let result = x.feed_forward(record.1.clone());
+        /*println!(
+            "For input data: X1: {}, X2: {}, network has outputted: Y1: {}, Y2: {}",
+            &record[[0, 0]],
+            &record[[1, 0]],
+            &result[[0, 0]],
+            &result[[1, 0]]
+        );
+        */
+        println!("Result for test data {:?} : {:?}", v_data[record.0], result);
     }
+    
 
     //let x =  Array::from_elem((1000,1000, 100), 1.);
     //dbg!(sigmoid(x));
