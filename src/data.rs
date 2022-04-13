@@ -1,6 +1,6 @@
 use ndarray::{arr2, Array2};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Animal {
     name: String,
     hair: f64,
@@ -23,20 +23,39 @@ pub struct Animal {
 }
 
 impl Animal {
-    pub fn new_list(dataset: &str) -> Vec<Animal>{
+    pub fn even_list(mut vector: Vec<Self>) -> Vec<Self> {
+        let mut classes = [0; 8];
+        let limit = 9;
+
+        vector = vector
+            .into_iter()
+            .filter(|a| {
+                classes[a.ani_type as usize] += 1;
+                classes[a.ani_type as usize] <= limit
+            })
+            .collect::<Vec<_>>();
+        vector
+    }
+
+    pub fn new_list(dataset: &str) -> Vec<Animal> {
         let mut values = dataset
             .lines()
             .map(|l| l.split(',').collect::<Vec<&str>>())
             .map(|v| Self::from_str(v))
             .collect::<Vec<_>>();
         //println!("{:?}", values[1]);
+        //
+
+        //values = Self::even_list(values);
+
         let max = values.iter().map(|a| a.legs as u8).max().unwrap();
         let min = values.iter().map(|a| a.legs as u8).min().unwrap();
 
-        values.iter_mut().for_each(|a| a.legs = (a.legs as u8 - min) as f64 / (max - min) as f64);
+        values
+            .iter_mut()
+            .for_each(|a| a.legs = (a.legs as u8 - min) as f64 / (max - min) as f64);
 
-        
-		values
+        values
     }
     fn from_str(data: Vec<&str>) -> Self {
         let mut an: Self = Default::default();
@@ -126,13 +145,21 @@ impl Animal {
                 self.tail,
                 self.domestic,
                 self.catsize,
-            ]]).t().to_owned(),
-			Array2::from_shape_vec((8,1),(0..8).map(|x| if x == self.ani_type {1.0} else {0.0}).collect::<Vec<f64>>()).unwrap()
+            ]])
+            .t()
+            .to_owned(),
+            Array2::from_shape_vec(
+                (8, 1),
+                (0..8)
+                    .map(|x| if x == self.ani_type { 1.0 } else { 0.0 })
+                    .collect::<Vec<f64>>(),
+            )
+            .unwrap(),
         )
     }
 }
 
-/* 
+/*
 fn main() {
     let data = std::fs::read_to_string("zoo.data");
     Animal::new_list(&data.unwrap());

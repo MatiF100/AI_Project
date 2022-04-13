@@ -70,7 +70,7 @@ impl Network {
         epochs: usize,
         mini_batch_size: usize,
         eta: f64,
-        test_data: Option<Vec<(Array2<f64>, usize)>>,
+        test_data: Option<&Vec<(Array2<f64>, usize)>>,
     ) {
         let mut rng = rand::thread_rng();
 
@@ -86,8 +86,10 @@ impl Network {
                 self.update_mini_batch(mini_batch, eta)
             }
             if let Some(data) = &test_data {
-                let output = self.evaluate(data);
-                println!("Epoch {}: {} / {}", j, output.1, output.0);
+                if j % 10 == 1 {
+                    let output = self.evaluate(data);
+                    println!("Epoch {}: {} / {}", j, output.1, output.0);
+                }
             } else {
                 //println!("Epoch {} complete!", j);
             }
@@ -208,17 +210,20 @@ impl Network {
 
 fn main() {
     println!("Hello, world!");
-    let mut x = Network::new(vec![16, 1, 1, 8]);
+    let mut x = Network::new(vec![16, 8, 8, 8]);
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
     //Vector for learning data - added manually ATM
     let mut t_data: Vec<(Array2<f64>, Array2<f64>)> = Vec::new();
     //Vector for validation data - added manually ATM
     let mut v_data: Vec<Array2<f64>> = Vec::new();
-    
+
     let data = std::fs::read_to_string("zoo.data");
-    let animal_list = data::Animal::new_list(&data.unwrap());
-    let animal_list = animal_list.iter().map(|a| a.into_training_arr2()).collect::<Vec<_>>();
+    let animal_list = data::Animal::new_list(&data.as_ref().unwrap());
+    let animal_list = animal_list
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
     t_data = animal_list;
 
     //Adding learning data
@@ -252,8 +257,32 @@ fn main() {
 
     //    dbg!(&t_data);
     let data_len = t_data.len();
-    x.sgd(&mut t_data, 5000, data_len, 0.10, None);
+    let test_data = t_data
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
 
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = data::Animal::even_list(animal_list);
+    let animal_list = animal_list
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+    t_data = animal_list;
+
+    println!("Learing record count: {}", t_data.len());
+    x.sgd(&mut t_data, 10000, data_len / 2, 0.5, Some(&test_data));
 
     //Adding validation data
     /*
@@ -276,7 +305,6 @@ fn main() {
         */
         println!("Result for test data {:?} : {:?}", v_data[record.0], result);
     }
-    
 
     //let x =  Array::from_elem((1000,1000, 100), 1.);
     //dbg!(sigmoid(x));
