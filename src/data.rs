@@ -23,6 +23,7 @@ pub struct Animal {
 }
 
 impl Animal {
+    #[allow(dead_code)]
     pub fn even_list(mut vector: Vec<Self>) -> Vec<Self> {
         let mut classes = [0; 7];
         let limit = 9;
@@ -35,6 +36,33 @@ impl Animal {
             })
             .collect::<Vec<_>>();
         vector
+    }
+    pub fn partitioned_list(vector: Vec<Self>, training_ratio: f64) -> (Vec<Self>, Vec<Self>) {
+        let mut classes: [usize; 7] = [0; 7];
+        vector
+            .iter()
+            .for_each(|v| classes[v.ani_type as usize] += 1);
+        let mut limits: [usize; 7] = classes
+            .iter()
+            .map(|&count| (count as f64 * training_ratio).round() as usize)
+            .collect::<Vec<usize>>()
+            .try_into()
+            .unwrap();
+
+        let mut train_v: Vec<Self> = Vec::with_capacity(limits.iter().sum());
+        let mut ver_v: Vec<Self> = Vec::with_capacity(vector.len() - limits.iter().sum::<usize>());
+
+        vector.into_iter().for_each(|val| {
+            let idx = val.ani_type as usize;
+            if limits[idx] > 0 {
+                limits[idx] -= 1;
+                train_v.push(val);
+            } else {
+                ver_v.push(val);
+            }
+        });
+
+        (train_v, ver_v)
     }
 
     pub fn new_list(dataset: &str) -> Vec<Animal> {

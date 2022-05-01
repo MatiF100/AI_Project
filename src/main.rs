@@ -13,7 +13,7 @@ where
     z
 }
 
-//Derivative of sigmoidal function  
+//Derivative of sigmoidal function
 fn sigmoid_prime<D>(z: Array<f64, D>) -> Array<f64, D>
 where
     D: Dimension,
@@ -101,7 +101,7 @@ impl Network {
             for mini_batch in &mut mini_batches {
                 //dbg!(&mini_batch);
                 self.update_mini_batch(mini_batch, eta)
-             }
+            }
 
             //Data verification. Can be ommited
             if let Some(data) = &test_data {
@@ -144,7 +144,6 @@ impl Network {
         // Calculating cost of the result
         let mut delta = Self::cost_derivative(activations.last().unwrap().clone(), y.clone())
             * sigmoid_prime(zs.last().unwrap().clone());
-
 
         // Setting up known values in nabla vectors
         *nabla_b.last_mut().unwrap() = delta.clone();
@@ -246,53 +245,34 @@ impl Network {
 fn main() {
     println!("Hello, world!");
     let mut x = Network::new(vec![16, 6, 6, 7]);
+
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
-    //Vector for learning data - added manually ATM
+
+    //Vector for learning data
     let mut t_data: Vec<(Array2<f64>, Array2<f64>)>;
-    //Vector for validation data - added manually ATM
-    let mut v_data: Vec<Array2<f64>> = Vec::new();
+    //Vector for validation data
+    let v_data: Vec<(Array2<f64>, Array2<f64>)>;
 
     let data = std::fs::read_to_string("zoo.data");
-    let animal_list = data::Animal::new_list(&data.as_ref().unwrap());
-    let animal_list = animal_list
+
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = data::Animal::partitioned_list(animal_list, 0.75);
+    t_data = animal_list
+        .0
         .iter()
         .map(|a| a.into_training_arr2())
         .collect::<Vec<_>>();
-    t_data = animal_list;
 
-    //Adding learning data
-    /*
-    t_data.push((
-        arr2(&[[0.0, 0.0]]).t().to_owned(),
-        arr2(&[[0.0, 1.0]]).t().to_owned(),
-    ));
-    t_data.push((
-        arr2(&[[0.0, 1.0]]).t().to_owned(),
-        arr2(&[[1.0, 0.0]]).t().to_owned(),
-    ));
-    t_data.push((
-        arr2(&[[1.0, 0.0]]).t().to_owned(),
-        arr2(&[[1.0, 0.0]]).t().to_owned(),
-    ));
-    t_data.push((
-        arr2(&[[1.0, 1.0]]).t().to_owned(),
-        arr2(&[[0.0, 1.0]]).t().to_owned(),
-    ));
-    */
-
-    v_data.push(t_data[0].0.clone());
-    v_data.push(t_data[2].0.clone());
-    v_data.push(t_data[6].0.clone());
-    v_data.push(t_data[9].0.clone());
-    v_data.push(t_data[15].0.clone());
-    v_data.push(t_data[26].0.clone());
-    v_data.push(t_data[12].0.clone());
-    v_data.push(t_data[14].0.clone());
+    v_data = animal_list
+        .1
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
 
     //    dbg!(&t_data);
     let data_len = t_data.len();
-    let test_data = t_data
+    let test_data = v_data
         .iter()
         .map(|(input, output)| {
             (
@@ -308,39 +288,17 @@ fn main() {
         .collect::<Vec<_>>()
         .to_owned();
 
-    let animal_list = data::Animal::new_list(&data.unwrap());
-    let animal_list = data::Animal::even_list(animal_list);
-    let animal_list = animal_list
-        .iter()
-        .map(|a| a.into_training_arr2())
-        .collect::<Vec<_>>();
-    t_data = animal_list;
-
     println!("Learing record count: {}", t_data.len());
-    x.sgd(&mut t_data, 10000, data_len / 2, 0.9, Some(&test_data));
+    x.sgd(&mut t_data, 50000, data_len / 2, 0.9, Some(&test_data));
 
-    //Adding validation data
     /*
-    v_data.push(arr2(&[[0.0, 0.0]]).t().to_owned());
-    v_data.push(arr2(&[[0.0, 1.0]]).t().to_owned());
-    v_data.push(arr2(&[[1.0, 0.0]]).t().to_owned());
-    v_data.push(arr2(&[[1.0, 1.0]]).t().to_owned());
-    v_data.push(arr2(&[[0.5, 0.7]]).t().to_owned());
-    */
-
     for record in v_data.iter().enumerate() {
         let result = x.feed_forward(record.1.clone());
-        /*println!(
-            "For input data: X1: {}, X2: {}, network has outputted: Y1: {}, Y2: {}",
-            &record[[0, 0]],
-            &record[[1, 0]],
-            &result[[0, 0]],
-            &result[[1, 0]]
-        );
-        */
+
         println!("Result for test data {:?} : {:?}", v_data[record.0], result);
     }
 
+    */
     //let x =  Array::from_elem((1000,1000, 100), 1.);
     //dbg!(sigmoid(x));
 }
