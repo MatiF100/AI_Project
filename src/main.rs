@@ -1,7 +1,17 @@
 use ndarray::{Array, Array2, Dimension};
 use rand::{prelude::SliceRandom, Rng};
 
+/*
+use std::thread;
+use std::sync::mpsc;
+*/
+
 mod data;
+
+// Main algorithm based on Neural Networks and Deep Learning by Michael Nielsen
+// Extended with variable learning rate based on Neural Network Design by Hagan, M.T., H.B. Demuth, and M.H. Beale
+
+const MAX_PERF_INC: f64 = 1.04;
 
 //Sigmoidal function - basic activation function for neurons
 fn sigmoid<D>(z: Array<f64, D>) -> Array<f64, D>
@@ -23,7 +33,7 @@ where
 }
 
 //Implementation of neural network. Includes both, learning algorithms and the usage of network itself
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Network {
     layers: Vec<usize>,
     biases: Vec<Array2<f64>>,
@@ -74,14 +84,25 @@ impl Network {
         return a;
     }
 
+    // Mean Square Error or Quadratic cost
+    fn mse(&self, training_data: &Vec<(Array2<f64>, Array2<f64>)>) -> f64 {
+        training_data
+            .iter()
+            .map(|v| (self.feed_forward(v.0.clone()), v.1.clone()))
+            .map(|v| (v.0 - v.1).fold(0.0, |_, val| val.powf(2.0)).sqrt())
+            .sum::<f64>()
+            / 2.0
+    }
+
     //Stochastic Gradient Descent function. Most basic algorithm for neural network training
     fn sgd(
         &mut self,
         training_data: &mut Vec<(Array2<f64>, Array2<f64>)>,
         epochs: usize,
         mini_batch_size: usize,
-        eta: f64,
+        mut eta: f64,
         test_data: Option<&Vec<(Array2<f64>, usize)>>,
+        eta_mod: Option<(f64, f64)>,
     ) {
         let mut rng = rand::thread_rng();
 
@@ -97,11 +118,44 @@ impl Network {
                 .map(|s| s.to_vec())
                 .collect::<Vec<Vec<_>>>();
 
-            //Sub-loob performing learning step for each of the mini-batch
-            for mini_batch in &mut mini_batches {
-                //dbg!(&mini_batch);
-                self.update_mini_batch(mini_batch, eta)
+            // Branching based on existance of adaptive learning rate parameters
+            match eta_mod {
+                Some((dec, inc)) => {
+                    // Saving state of network before readjustment of weights and biases
+                    let saved_weights = self.weights.clone();
+                    let saved_biases = self.biases.clone();
+                    let previous_error = self.mse(training_data);
+
+                    //Sub-loob performing learning step for each of the mini-batch
+                    for mini_batch in &mut mini_batches {
+                        //dbg!(&mini_batch);
+                        self.update_mini_batch(mini_batch, eta)
+                    }
+
+                    // Verification of newly achieved Mean Square Error
+                    let new_error = self.mse(training_data);
+                    if new_error > previous_error * MAX_PERF_INC{
+                        // Restoring backup
+                        self.weights =  saved_weights;
+                        self.biases = saved_biases;
+
+                        // Adaptation - learning rate decreases
+                        eta *= dec;
+                    }else if new_error < previous_error{
+                        // Adaptation - learning rate increases
+                        eta*=inc;
+                    }
+                    // else statement does nothing - ommited
+                }
+                None => {
+                    //Sub-loob performing learning step for each of the mini-batch
+                    for mini_batch in &mut mini_batches {
+                    //dbg!(&mini_batch);
+                    self.update_mini_batch(mini_batch, eta)
+                    }
+                }
             }
+            
 
             //Data verification. Can be ommited
             if let Some(data) = &test_data {
@@ -141,7 +195,7 @@ impl Network {
             activations.push(activation.clone());
         }
 
-        // Calculating cost of the result
+        // Calculating per_class cost of the result
         let mut delta = Self::cost_derivative(activations.last().unwrap().clone(), y.clone())
             * sigmoid_prime(zs.last().unwrap().clone());
 
@@ -244,7 +298,7 @@ impl Network {
 
 fn main() {
     println!("Hello, world!");
-    let mut x = Network::new(vec![16, 6, 6, 7]);
+    let mut x = Network::new(vec![16, 4, 4, 7]);
 
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
@@ -288,9 +342,50 @@ fn main() {
         .collect::<Vec<_>>()
         .to_owned();
 
-    println!("Learing record count: {}", t_data.len());
-    x.sgd(&mut t_data, 50000, data_len / 2, 0.9, Some(&test_data));
+    println!("Learning record count: {}", t_data.len());
+    
+    x.sgd(
+        &mut t_data,
+        50000,
+        data_len / 2,
+        0.9,
+        Some(&test_data),
+        //None
+        Some((0.7, 1.15)),
+    );
+    
+    /* 
+    let mut y = x.clone();
+    let mut t_data_2 = t_data.clone();
+    let test_data_2 = test_data.clone();
 
+    thread::spawn(move ||
+        x.sgd(
+        &mut t_data,
+        50000,
+        data_len / 2,
+        0.9,
+        Some(&test_data),
+        //None
+        Some((0.9, 1.05)),
+    )
+    
+    );
+
+    thread::spawn(move ||
+        y.sgd(
+        &mut t_data_2,
+        50000,
+        data_len / 2,
+        0.9,
+        Some(&test_data_2),
+        None
+        //Some((0.9, 1.05)),
+    )
+    );
+
+    loop{}
+    */
     /*
     for record in v_data.iter().enumerate() {
         let result = x.feed_forward(record.1.clone());
