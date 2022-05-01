@@ -24,7 +24,7 @@ pub struct Animal {
 
 impl Animal {
     pub fn even_list(mut vector: Vec<Self>) -> Vec<Self> {
-        let mut classes = [0; 8];
+        let mut classes = [0; 7];
         let limit = 9;
 
         vector = vector
@@ -122,7 +122,7 @@ impl Animal {
             "0" => 0.0,
             _ => 1.0,
         };
-        an.ani_type = it.next().unwrap().parse::<u8>().unwrap();
+        an.ani_type = it.next().unwrap().parse::<u8>().unwrap() - 1;
 
         an
     }
@@ -149,8 +149,8 @@ impl Animal {
             .t()
             .to_owned(),
             Array2::from_shape_vec(
-                (8, 1),
-                (0..8)
+                (7, 1),
+                (0..7)
                     .map(|x| if x == self.ani_type { 1.0 } else { 0.0 })
                     .collect::<Vec<f64>>(),
             )
