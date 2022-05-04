@@ -11,7 +11,7 @@ mod data;
 // Main algorithm based on Neural Networks and Deep Learning by Michael Nielsen
 // Extended with variable learning rate based on Neural Network Design by Hagan, M.T., H.B. Demuth, and M.H. Beale
 
-const MAX_PERF_INC: f64 = 1.04;
+const MAX_PERF_INC: f64 = 1.05;
 
 //Sigmoidal function - basic activation function for neurons
 fn sigmoid<D>(z: Array<f64, D>) -> Array<f64, D>
@@ -34,17 +34,19 @@ where
 
 //Implementation of neural network. Includes both, learning algorithms and the usage of network itself
 #[derive(Debug, Clone)]
-struct Network {
+struct Network<'a> {
     layers: Vec<usize>,
     biases: Vec<Array2<f64>>,
     weights: Vec<Array2<f64>>,
+    name: &'a str,
 }
 
-impl Network {
+impl Network<'_> {
     //Constructor
     fn new(layers: Vec<usize>) -> Self {
         let mut rng = rand::thread_rng();
         Self {
+            name: "Network 0",
             //Biases are initialized with random values
             biases: layers
                 .iter()
@@ -134,34 +136,33 @@ impl Network {
 
                     // Verification of newly achieved Mean Square Error
                     let new_error = self.mse(training_data);
-                    if new_error > previous_error * MAX_PERF_INC{
+                    if new_error > previous_error * MAX_PERF_INC {
                         // Restoring backup
-                        self.weights =  saved_weights;
+                        self.weights = saved_weights;
                         self.biases = saved_biases;
 
                         // Adaptation - learning rate decreases
                         eta *= dec;
-                    }else if new_error < previous_error{
+                    } else if new_error < previous_error {
                         // Adaptation - learning rate increases
-                        eta*=inc;
+                        eta *= inc;
                     }
                     // else statement does nothing - ommited
                 }
                 None => {
                     //Sub-loob performing learning step for each of the mini-batch
                     for mini_batch in &mut mini_batches {
-                    //dbg!(&mini_batch);
-                    self.update_mini_batch(mini_batch, eta)
+                        //dbg!(&mini_batch);
+                        self.update_mini_batch(mini_batch, eta)
                     }
                 }
             }
-            
 
             //Data verification. Can be ommited
             if let Some(data) = &test_data {
                 if j % 10 == 1 {
                     let output = self.evaluate(data);
-                    println!("Epoch {}: {} / {}", j, output.1, output.0);
+                    println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
                 }
             } else {
                 //println!("Epoch {} complete!", j);
@@ -298,7 +299,7 @@ impl Network {
 
 fn main() {
     println!("Hello, world!");
-    let mut x = Network::new(vec![16, 4, 4, 7]);
+    let mut x = Network::new(vec![16, 3, 4, 7]);
 
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
@@ -343,7 +344,7 @@ fn main() {
         .to_owned();
 
     println!("Learning record count: {}", t_data.len());
-    
+
     x.sgd(
         &mut t_data,
         50000,
@@ -353,8 +354,8 @@ fn main() {
         //None
         Some((0.7, 1.15)),
     );
-    
-    /* 
+
+    /*
     let mut y = x.clone();
     let mut t_data_2 = t_data.clone();
     let test_data_2 = test_data.clone();
@@ -369,7 +370,7 @@ fn main() {
         //None
         Some((0.9, 1.05)),
     )
-    
+
     );
 
     thread::spawn(move ||
