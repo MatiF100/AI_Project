@@ -9,6 +9,7 @@ use std::sync::mpsc;
 mod data;
 
 // Main algorithm based on Neural Networks and Deep Learning by Michael Nielsen
+// Math formulas and definitions slightly modified according to information provided by Prof. Jacek Kluska, and Prof. Roman Zajdel during lectures and individual consultation
 // Extended with variable learning rate based on Neural Network Design by Hagan, M.T., H.B. Demuth, and M.H. Beale
 
 const MAX_PERF_INC: f64 = 1.05;
@@ -120,6 +121,7 @@ impl Network<'_> {
                 .map(|s| s.to_vec())
                 .collect::<Vec<Vec<_>>>();
 
+            let batch_count = mini_batches.len();
             // Branching based on existance of adaptive learning rate parameters
             match eta_mod {
                 Some((dec, inc)) => {
@@ -131,7 +133,7 @@ impl Network<'_> {
                     //Sub-loob performing learning step for each of the mini-batch
                     for mini_batch in &mut mini_batches {
                         //dbg!(&mini_batch);
-                        self.update_mini_batch(mini_batch, eta)
+                        self.update_mini_batch(mini_batch, eta, batch_count)
                     }
 
                     // Verification of newly achieved Mean Square Error
@@ -153,7 +155,7 @@ impl Network<'_> {
                     //Sub-loob performing learning step for each of the mini-batch
                     for mini_batch in &mut mini_batches {
                         //dbg!(&mini_batch);
-                        self.update_mini_batch(mini_batch, eta)
+                        self.update_mini_batch(mini_batch, eta, batch_count)
                     }
                 }
             }
@@ -184,45 +186,74 @@ impl Network<'_> {
             .collect::<Vec<Array2<f64>>>();
 
         // Preparing initial information for forward network pass
+        // Because of lifetimes and loop scope further in the function, it is best to make copies of input matrix here
         let mut activation = x.clone();
-        let mut activations = vec![x.clone()];
+        let mut activations = vec![activation];
+
+        // zs is a Vector of neurons non linear blocks inputs - these will be calculated in the following loop
         let mut zs: Vec<Array2<f64>> = Vec::new();
 
         // Performing feedforward operation
         for (b, w) in self.biases.iter().zip(self.weights.iter()) {
-            let z = w.dot(&activation) + b;
+            // z is the input of non-linear block, necessary in the following gradient calculation
+            let z = w.dot(activations.iter().last().unwrap()) + b;
             zs.push(z.clone());
+
+            // As the current matrix of non-linear block inputs is calculated, it is passed as argument to the activation function
+            // TODO: in this place other activation functions can be implemented
             activation = sigmoid(z);
-            activations.push(activation.clone());
+
+            // Saving the outputs of neuron layer, for later use
+            activations.push(activation);
         }
 
-        // Calculating per_class cost of the result
+        // Calculating per_class or per_output cost of the result at this point, it is also worth noting that the "delta" is only partially calculated
+        // With used notation, the delta itself does not include the eta, or learning rate
+        // Cost derivative function only calculates error, or difference between achieved and expected output
+        // TODO: possibly unnecessary function call
         let mut delta = Self::cost_derivative(activations.last().unwrap().clone(), y.clone())
             * sigmoid_prime(zs.last().unwrap().clone());
 
-        // Setting up known values in nabla vectors
+        // Setting up known values in gradient vectors
+        // Last layer is easiest to calculate, as it does not require any data not available at the moment
+        // We they will be used as we perform the backward pass, calculating bias and weight gradients for every layer
         *nabla_b.last_mut().unwrap() = delta.clone();
-        //dbg!(delta);
         *nabla_w.last_mut().unwrap() = delta.dot(&activations[activations.len() - 2].t());
 
         // Performing backward network pass
-        for l in 2..self.layers.len() {
-            let z = &zs[zs.len() - l];
-            let sp = sigmoid_prime(z.clone());
+        // Side note: if the book gives example of any identifier as "l" "I" or "L" one should never follow the book and come up with anything that differs from 1
+        for idx in 2..self.layers.len() {
+            // Getting the input of non-linear block for the idx-th layer counting from the end
+            let z = &zs[zs.len() - idx];
 
-            delta = self.weights[self.weights.len() - l + 1].t().dot(&delta) * sp;
+            // Calculating the derivative of activation function for given input
+            let derivative = sigmoid_prime(z.clone());
 
+            // Calculating delta - gradient for given layer
+            // TODO: Include the generic formula into readme
+            delta = self.weights[self.weights.len() - idx + 1].t().dot(&delta) * derivative;
+
+            // Boilerplate forced by borrow-checker. Since .len() uses immutable reference, it would block the assignment operation if used inline
+            // Works fine this way though, since usize implements "Copy"
             let b_len = nabla_b.len();
             let w_len = nabla_w.len();
-            nabla_b[b_len - l] = delta.clone();
-            nabla_w[w_len - l] = delta.dot(&activations[activations.len() - l - 1].t());
+
+            // Actual gradient for biases and weights is pretty similar
+            // The difference is that weight gradient is additionally multiplied by the activation state of given layer
+            nabla_b[b_len - idx] = delta.clone();
+            nabla_w[w_len - idx] = delta.dot(&activations[activations.len() - idx - 1].t());
         }
 
         // Returning calculated gradient vectors
         (nabla_b, nabla_w)
     }
 
-    fn update_mini_batch(&mut self, mini_batch: &Vec<(Array2<f64>, Array2<f64>)>, eta: f64) {
+    fn update_mini_batch(
+        &mut self,
+        mini_batch: &Vec<(Array2<f64>, Array2<f64>)>,
+        eta: f64,
+        batches_count: usize,
+    ) {
         // Allocation of gradient vectors
         let mut nabla_b = self
             .biases
@@ -258,13 +289,13 @@ impl Network<'_> {
             .weights
             .iter()
             .zip(nabla_w.iter())
-            .map(|(w, nw)| w - nw * (eta / mini_batch.len() as f64) as f64)
+            .map(|(w, nw)| w - nw * (eta / batches_count as f64) as f64)
             .collect();
         self.biases = self
             .biases
             .iter()
             .zip(nabla_b.iter())
-            .map(|(b, nb)| b - nb * (eta / mini_batch.len() as f64) as f64)
+            .map(|(b, nb)| b - nb * (eta / batches_count as f64) as f64)
             .collect();
     }
 
@@ -299,7 +330,7 @@ impl Network<'_> {
 
 fn main() {
     println!("Hello, world!");
-    let mut x = Network::new(vec![16, 3, 4, 7]);
+    let mut x = Network::new(vec![16, 8, 7]);
 
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
@@ -349,10 +380,9 @@ fn main() {
         &mut t_data,
         50000,
         data_len / 2,
-        0.9,
+        0.99,
         Some(&test_data),
-        //None
-        Some((0.7, 1.15)),
+        None, //Some((0.7, 1.15)),
     );
 
     /*
