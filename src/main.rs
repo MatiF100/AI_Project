@@ -108,11 +108,12 @@ impl Network {
         mut eta: f64,
         test_data: Option<&Vec<(Array2<f64>, usize)>>,
         eta_mod: Option<(f64, f64)>,
+        target_cost: f64,
     ) {
         let mut rng = rand::thread_rng();
 
         //Main loop performing learning step with each epoch
-        for j in 0..epochs {
+        for j in 0..=epochs {
             //Randomization of data for usage of mini-batch
             training_data.shuffle(&mut rng);
 
@@ -140,6 +141,13 @@ impl Network {
 
                     // Verification of newly achieved Mean Square Error
                     let new_error = self.mse(training_data);
+                    if new_error < target_cost {
+                        if let Some(data) = &test_data {
+                            let output = self.evaluate(data);
+                            println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
+                        }
+                        break;
+                    }
                     if new_error > previous_error * MAX_PERF_INC {
                         // Restoring backup
                         self.weights = saved_weights;
@@ -157,14 +165,22 @@ impl Network {
                     //Sub-loob performing learning step for each of the mini-batch
                     for mini_batch in &mut mini_batches {
                         //dbg!(&mini_batch);
-                        self.update_mini_batch(mini_batch, eta, batch_count)
+                        self.update_mini_batch(mini_batch, eta, batch_count);
+                        let new_error = self.mse(training_data);
+                        if new_error < target_cost {
+                            if let Some(data) = &test_data {
+                                let output = self.evaluate(data);
+                                println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
+                            }
+                            break;
+                        }
                     }
                 }
             }
 
             //Data verification. Can be ommited
             if let Some(data) = &test_data {
-                if j % 100 == 1 {
+                if j % 10 == 0 {
                     let output = self.evaluate(data);
                     println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
                 }
@@ -332,13 +348,13 @@ impl Network {
 
 fn main() {
     println!("Hello, world!");
-    let mut x = Network::new(vec![16, 8, 7]);
+    //let x = Network::new(vec![16, 8, 7]);
 
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
 
     //Vector for learning data
-    let mut t_data: Vec<(Array2<f64>, Array2<f64>)>;
+    let t_data: Vec<(Array2<f64>, Array2<f64>)>;
     //Vector for validation data
     let v_data: Vec<(Array2<f64>, Array2<f64>)>;
 
@@ -387,22 +403,22 @@ fn main() {
         0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
     ];
 
-    let mut threads = std::sync::Arc::new(std::sync::Mutex::new(0));
+    let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
     let (sync_tx, sync_rx) = mpsc::sync_channel(8);
     let (tx, rx) = mpsc::channel();
 
     let tmp_threads = threads.clone();
     thread::spawn(move || {
-        for S1 in 8..16 {
-            for S2 in 0..(30 - S1) {
-                let mut x = Network::new(vec![16, S1, S2, 7]);
+        for s1 in 1..t_data.len() / 3 {
+            for s2 in 0..(t_data.len() / 3 - s1) {
+                let x = Network::new(vec![16, s1, s2, 7]);
                 for lr_inc in &lr_inc_step {
                     for lr_dec in &lr_dec_step {
                         for lr in &lr_step {
                             let mut net = x.clone();
                             net.name = format!(
                                 "Network: S1: {} S2: {} lr: {} lr_dec: {} lr_inc: {} ",
-                                S1, S2, lr, lr_dec, lr_inc
+                                s1, s2, lr, lr_dec, lr_inc
                             );
                             let mut t_data = t_data.clone();
                             let test_data = test_data.clone();
@@ -424,6 +440,7 @@ fn main() {
                                     Some(&test_data),
                                     //None
                                     Some((local_lrs.1, local_lrs.2)),
+                                    1.0,
                                 );
                                 local_tx.send(()).unwrap();
                             });
