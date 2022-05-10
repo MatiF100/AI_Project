@@ -1,10 +1,8 @@
 use ndarray::{Array, Array2, Dimension};
 use rand::{prelude::SliceRandom, Rng};
 
-/*
-use std::thread;
 use std::sync::mpsc;
-*/
+use std::thread;
 
 mod data;
 
@@ -35,19 +33,23 @@ where
 
 //Implementation of neural network. Includes both, learning algorithms and the usage of network itself
 #[derive(Debug, Clone)]
-struct Network<'a> {
+struct Network {
     layers: Vec<usize>,
     biases: Vec<Array2<f64>>,
     weights: Vec<Array2<f64>>,
-    name: &'a str,
+    name: String,
 }
 
-impl Network<'_> {
+impl Network {
     //Constructor
     fn new(layers: Vec<usize>) -> Self {
         let mut rng = rand::thread_rng();
+        let layers = layers
+            .into_iter()
+            .filter(|x| *x > 0)
+            .collect::<Vec<usize>>();
         Self {
-            name: "Network 0",
+            name: String::from("Network 0"),
             //Biases are initialized with random values
             biases: layers
                 .iter()
@@ -162,7 +164,7 @@ impl Network<'_> {
 
             //Data verification. Can be ommited
             if let Some(data) = &test_data {
-                if j % 10 == 1 {
+                if j % 100 == 1 {
                     let output = self.evaluate(data);
                     println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
                 }
@@ -375,7 +377,76 @@ fn main() {
         .to_owned();
 
     println!("Learning record count: {}", t_data.len());
+    let lr_step = vec![
+        0.1, 0.2, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99,
+    ];
+    let lr_inc_step = vec![
+        1.01, 1.03, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3,
+    ];
+    let lr_dec_step = vec![
+        0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
+    ];
 
+    let mut threads = std::sync::Arc::new(std::sync::Mutex::new(0));
+    let (sync_tx, sync_rx) = mpsc::sync_channel(8);
+    let (tx, rx) = mpsc::channel();
+
+    let tmp_threads = threads.clone();
+    thread::spawn(move || {
+        for S1 in 8..16 {
+            for S2 in 0..(30 - S1) {
+                let mut x = Network::new(vec![16, S1, S2, 7]);
+                for lr_inc in &lr_inc_step {
+                    for lr_dec in &lr_dec_step {
+                        for lr in &lr_step {
+                            let mut net = x.clone();
+                            net.name = format!(
+                                "Network: S1: {} S2: {} lr: {} lr_dec: {} lr_inc: {} ",
+                                S1, S2, lr, lr_dec, lr_inc
+                            );
+                            let mut t_data = t_data.clone();
+                            let test_data = test_data.clone();
+
+                            let local_lrs = (*lr, *lr_dec, *lr_inc);
+                            let local_sync_tx = sync_tx.clone();
+                            let local_tx = tx.clone();
+
+                            local_sync_tx.send(()).unwrap();
+                            let inner_threads = std::sync::Arc::clone(&tmp_threads);
+
+                            *inner_threads.lock().unwrap() += 1;
+                            thread::spawn(move || {
+                                net.sgd(
+                                    &mut t_data,
+                                    1000,
+                                    data_len / 2,
+                                    local_lrs.0,
+                                    Some(&test_data),
+                                    //None
+                                    Some((local_lrs.1, local_lrs.2)),
+                                );
+                                local_tx.send(()).unwrap();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    loop {
+        let threads = std::sync::Arc::clone(&threads);
+        //println!("{}", threads.lock().unwrap());
+        rx.recv().unwrap();
+        //println!("{}", threads.lock().unwrap());
+        sync_rx.recv().unwrap();
+        *threads.lock().unwrap() -= 1;
+        if *threads.lock().unwrap() <= 0 {
+            break;
+        }
+    }
+
+    /*
     x.sgd(
         &mut t_data,
         50000,
@@ -384,6 +455,7 @@ fn main() {
         Some(&test_data),
         None, //Some((0.7, 1.15)),
     );
+    */
 
     /*
     let mut y = x.clone();
