@@ -400,10 +400,10 @@ fn main() {
 
     println!("Learning record count: {}", t_data.len());
     let lr_step = vec![
-        0.1, 0.2, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99,
+        0.0001, 0.001, 0.01,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 10.0,
     ];
     let lr_inc_step = vec![
-        1.01, 1.03, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3,
+        1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4,
     ];
     let lr_dec_step = vec![
         0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
@@ -415,8 +415,11 @@ fn main() {
 
     let tmp_threads = threads.clone();
     thread::spawn(move || {
-        for s1 in 0..t_data.len() - 7 / 3 {
-            for s2 in 0..(t_data.len() / 3 - s1) {
+        for s1 in 0..t_data.len() / 3 - 7 {
+            for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+                if s2 == 0 && s1 != 0{
+                    continue;
+                }
                 let x = Network::new(vec![16, s1, s2, 7]);
                 for lr in &lr_step {
                     for lr_dec in &lr_dec_step {
