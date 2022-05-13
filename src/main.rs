@@ -114,7 +114,7 @@ impl Network {
         test_data: Option<&Vec<(Array2<f64>, usize)>>,
         eta_mod: Option<(f64, f64)>,
         target_cost: f64,
-        report_interval: usize
+        report_interval: usize,
     ) {
         let mut rng = rand::thread_rng();
 
@@ -418,14 +418,11 @@ fn main() {
         for s1 in 0..t_data.len() - 7 / 3 {
             for s2 in 0..(t_data.len() / 3 - s1) {
                 let x = Network::new(vec![16, s1, s2, 7]);
-                for lr_inc in &lr_inc_step {
+                for lr in &lr_step {
                     for lr_dec in &lr_dec_step {
-                        for lr in &lr_step {
+                        for lr_inc in &lr_inc_step {
                             let mut net = x.clone();
-                            net.name = format!(
-                                "{},{},{},{},{}",
-                                s1, s2, lr, lr_dec, lr_inc
-                            );
+                            net.name = format!("{},{},{},{},{}", s1, s2, lr, lr_dec, lr_inc);
                             let mut t_data = t_data.clone();
                             let test_data = test_data.clone();
 
@@ -441,13 +438,13 @@ fn main() {
                                 net.sgd(
                                     &mut t_data,
                                     1000,
-                                    data_len ,
+                                    data_len,
                                     local_lrs.0,
                                     Some(&test_data),
                                     //None
                                     Some((local_lrs.1, local_lrs.2)),
                                     0.00001,
-                                    1000
+                                    1000,
                                 );
                                 local_tx.send(()).unwrap();
                             });
