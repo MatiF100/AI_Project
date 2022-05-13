@@ -89,14 +89,19 @@ impl Network {
         return a;
     }
 
-    // Mean Square Error or Quadratic cost
+    // Total quadratic cost of a network for given training data
+    // For single output neuron, or entire neuron layer if we use matrixes, the formula is (expected_out - output)^2 / 2
     fn mse(&self, training_data: &Vec<(Array2<f64>, Array2<f64>)>) -> f64 {
         training_data
             .iter()
+            // Performing forward pass to determine network's outputs for entire training set
             .map(|v| (self.feed_forward(v.0.clone()), v.1.clone()))
-            .map(|v| (v.0 - v.1).fold(0.0, |_, val| val.powf(2.0)).sqrt())
+            // Calculating error for each training pair (quadratic cost)
+            .map(|v| (v.0 - v.1).fold(0.0, |_, val| val.powf(2.0)) / 2.0)
+            // Calculating Mean Squared Error - average squared cost over all training pairs
+            .map(|e| e.powf(2.0))
             .sum::<f64>()
-            / 2.0
+            / training_data.len() as f64
     }
 
     //Stochastic Gradient Descent function. Most basic algorithm for neural network training
@@ -109,11 +114,12 @@ impl Network {
         test_data: Option<&Vec<(Array2<f64>, usize)>>,
         eta_mod: Option<(f64, f64)>,
         target_cost: f64,
+        report_interval: usize
     ) {
         let mut rng = rand::thread_rng();
 
         //Main loop performing learning step with each epoch
-        for j in 0..=epochs {
+        for j in 1..=epochs {
             //Randomization of data for usage of mini-batch
             training_data.shuffle(&mut rng);
 
@@ -144,7 +150,7 @@ impl Network {
                     if new_error < target_cost {
                         if let Some(data) = &test_data {
                             let output = self.evaluate(data);
-                            println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
+                            println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
                         }
                         break;
                     }
@@ -170,7 +176,7 @@ impl Network {
                         if new_error < target_cost {
                             if let Some(data) = &test_data {
                                 let output = self.evaluate(data);
-                                println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
+                                println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
                             }
                             break;
                         }
@@ -180,9 +186,9 @@ impl Network {
 
             //Data verification. Can be ommited
             if let Some(data) = &test_data {
-                if j % 10 == 0 {
+                if j % report_interval == 0 && report_interval != 0 {
                     let output = self.evaluate(data);
-                    println!("{}, Epoch {}: {} / {}", self.name, j, output.1, output.0);
+                    println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
                 }
             } else {
                 //println!("Epoch {} complete!", j);
@@ -404,12 +410,12 @@ fn main() {
     ];
 
     let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
-    let (sync_tx, sync_rx) = mpsc::sync_channel(8);
+    let (sync_tx, sync_rx) = mpsc::sync_channel(16);
     let (tx, rx) = mpsc::channel();
 
     let tmp_threads = threads.clone();
     thread::spawn(move || {
-        for s1 in 1..t_data.len() / 3 {
+        for s1 in 0..t_data.len() - 7 / 3 {
             for s2 in 0..(t_data.len() / 3 - s1) {
                 let x = Network::new(vec![16, s1, s2, 7]);
                 for lr_inc in &lr_inc_step {
@@ -417,7 +423,7 @@ fn main() {
                         for lr in &lr_step {
                             let mut net = x.clone();
                             net.name = format!(
-                                "Network: S1: {} S2: {} lr: {} lr_dec: {} lr_inc: {} ",
+                                "{},{},{},{},{}",
                                 s1, s2, lr, lr_dec, lr_inc
                             );
                             let mut t_data = t_data.clone();
@@ -435,12 +441,13 @@ fn main() {
                                 net.sgd(
                                     &mut t_data,
                                     1000,
-                                    data_len / 2,
+                                    data_len ,
                                     local_lrs.0,
                                     Some(&test_data),
                                     //None
                                     Some((local_lrs.1, local_lrs.2)),
-                                    1.0,
+                                    0.00001,
+                                    1000
                                 );
                                 local_tx.send(()).unwrap();
                             });
