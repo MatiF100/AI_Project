@@ -410,13 +410,13 @@ fn main() {
     ];
 
     let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
-    let (sync_tx, sync_rx) = mpsc::sync_channel(16);
+    let (sync_tx, sync_rx) = mpsc::sync_channel(1);
     let (tx, rx) = mpsc::channel();
 
     let tmp_threads = threads.clone();
     thread::spawn(move || {
-        for s1 in 0..t_data.len() / 3 - 7 {
-            for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+        for s1 in 8..t_data.len() / 3 - 7 {
+            for s2 in 8..(t_data.len() / 3 - 7 - s1) {
                 if s2 == 0 && s1 != 0{
                     continue;
                 }
@@ -440,14 +440,14 @@ fn main() {
                             thread::spawn(move || {
                                 net.sgd(
                                     &mut t_data,
-                                    1000,
+                                    5000,
                                     data_len,
                                     local_lrs.0,
                                     Some(&test_data),
                                     //None
                                     Some((local_lrs.1, local_lrs.2)),
                                     0.00001,
-                                    1000,
+                                    1,
                                 );
                                 local_tx.send(()).unwrap();
                             });
