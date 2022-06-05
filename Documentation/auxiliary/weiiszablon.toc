@@ -4,23 +4,25 @@
 \contentsline {subsection}{\numberline {1.2}Opis i przygotowanie wykorzystanych danych}{\footnotesize 5}{subsection.1.2}%
 \contentsline {section}{\numberline {2}Zagadnienia teoretyczne związane z wykorzystaną siecią neuronową oraz algorytmem uczenia}{\footnotesize 7}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Model neuronu}{\footnotesize 7}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Sieć neuronowa wielowarstwowa}{\footnotesize 7}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Proces uczenia sieci z wykorzystaniem metody gradientowej}{\footnotesize 7}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Ogólny algorytm gradientowy}{\footnotesize 7}{subsubsection.2.3.1}%
-\contentsline {subsubsection}{\numberline {2.3.2}Metoda stochastycznego spadku gradientu}{\footnotesize 7}{subsubsection.2.3.2}%
-\contentsline {section}{\numberline {3}Wstęp/wprowadzenie}{\footnotesize 7}{section.3}%
-\contentsline {section}{\numberline {4}Tekst zasadniczy -- I}{\footnotesize 8}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Formatowanie rozdziałów i podrozdziałów}{\footnotesize 8}{subsection.4.1}%
-\contentsline {section}{\numberline {5}Tekst zasadniczy -- II}{\footnotesize 9}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Formatowanie tekstu. Należy pamiętać, że na końcu tytułu rozdziału, podrozdziału i zakresu nie umieszcza się kropki}{\footnotesize 9}{subsection.5.1}%
-\contentsline {subsubsection}{\numberline {5.1.1}Marginesy i akapity}{\footnotesize 9}{subsubsection.5.1.1}%
-\contentsline {subsubsection}{\numberline {5.1.2}Zalecenia co do sposobu pisania jednostek i symboli wielkości fizycznych}{\footnotesize 10}{subsubsection.5.1.2}%
-\contentsline {subsubsection}{\numberline {5.1.3}Rysunki i tabele}{\footnotesize 12}{subsubsection.5.1.3}%
-\contentsline {subsubsection}{\numberline {5.1.4}Wzory matematyczne}{\footnotesize 13}{subsubsection.5.1.4}%
-\contentsline {subsubsection}{\numberline {5.1.5}Listingi programów}{\footnotesize 15}{subsubsection.5.1.5}%
-\contentsline {subsubsection}{\numberline {5.1.6}Numerowanie i punktowanie}{\footnotesize 15}{subsubsection.5.1.6}%
-\contentsline {subsection}{\numberline {5.2}Wykaz literatury}{\footnotesize 16}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Wydruk pracy}{\footnotesize 16}{subsection.5.3}%
-\contentsline {section}{\numberline {6}Podsumowanie i wnioski końcowe}{\footnotesize 18}{section.6}%
-\contentsline {section}{Załączniki}{\footnotesize 19}{section.6}%
-\contentsline {section}{Literatura}{\footnotesize 20}{section.6}%
+\contentsline {subsection}{\numberline {2.2}Sieć neuronowa jednowarstwowa}{\footnotesize 8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Sieć neuronowa wielowarstwowa}{\footnotesize 9}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Proces uczenia sieci z wykorzystaniem metody gradientowej}{\footnotesize 10}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Ogólny algorytm gradientowy}{\footnotesize 11}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Zastosowanie algorytmu gradientowego w sieciach wielowarstwowych}{\footnotesize 13}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Metoda stochastycznego spadku gradientu}{\footnotesize 13}{subsubsection.2.4.3}%
+\contentsline {section}{\numberline {3}Wstęp/wprowadzenie}{\footnotesize 13}{section.3}%
+\contentsline {section}{\numberline {4}Tekst zasadniczy -- I}{\footnotesize 15}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Formatowanie rozdziałów i podrozdziałów}{\footnotesize 15}{subsection.4.1}%
+\contentsline {section}{\numberline {5}Tekst zasadniczy -- II}{\footnotesize 16}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Formatowanie tekstu. Należy pamiętać, że na końcu tytułu rozdziału, podrozdziału i zakresu nie umieszcza się kropki}{\footnotesize 16}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Marginesy i akapity}{\footnotesize 16}{subsubsection.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}Zalecenia co do sposobu pisania jednostek i symboli wielkości fizycznych}{\footnotesize 17}{subsubsection.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.1.3}Rysunki i tabele}{\footnotesize 19}{subsubsection.5.1.3}%
+\contentsline {subsubsection}{\numberline {5.1.4}Wzory matematyczne}{\footnotesize 20}{subsubsection.5.1.4}%
+\contentsline {subsubsection}{\numberline {5.1.5}Listingi programów}{\footnotesize 22}{subsubsection.5.1.5}%
+\contentsline {subsubsection}{\numberline {5.1.6}Numerowanie i punktowanie}{\footnotesize 22}{subsubsection.5.1.6}%
+\contentsline {subsection}{\numberline {5.2}Wykaz literatury}{\footnotesize 23}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Wydruk pracy}{\footnotesize 23}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Podsumowanie i wnioski końcowe}{\footnotesize 25}{section.6}%
+\contentsline {section}{Załączniki}{\footnotesize 26}{section.6}%
+\contentsline {section}{Literatura}{\footnotesize 27}{section.6}%

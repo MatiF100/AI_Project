@@ -102,10 +102,223 @@ W tym celu przydzielono $25\%$ rekordów należących do danej klasy do zbioru w
 
 \section{Zagadnienia teoretyczne związane z wykorzystaną siecią neuronową oraz algorytmem uczenia}
 \subsection{Model neuronu}
+Neuron jest podstawowym elementem sieci neuronowej.
+Jego elementami są:
+\begin{itemize}
+	\item Zbiór wejść $x$ długości $L$
+	\item Zbiór powiązanych z wejściami wag $w$ długości $L$
+	\item Wartość przesunięcia $b$
+	\item Blok sumujący
+	\item Funkcja aktywacji $f$
+	\item Wyjście $a$
+\end{itemize}
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=12cm]{figures/models/neuronModel.png}
+	\caption{Graficzny model neuronu}
+	\label{Fig:neuron}
+\end{figure}
+
+Wartość sygnału wyściowego neuronu możemy określić wzorem:
+\begin{equation}
+	\label{eq:neuronOut}
+	a = f\left(\sum\limits_{j=1}^{L}w_{j}x_{j} + b\right)
+\end{equation}
+
+W powyższym zapisie, $x_j$ oraz $w_j$ oznaczają odpowiednio kolejne wartości wejściowe i powiązane z nimi wagi (współczynniki wagowe).
+Zapis ten możemy jednakże uprościć, zakładając że $x = \left[ x_1, x_2, ..., x_L\right]^T$ będzie wektorem kolumnowym wejść, $w = \left[ w_1, w_2, ..., w_L\right]$ - macierzą wierszową powiązanych z wejściami wag, natomiast wartości $a$ oraz $b$ - skalarami.
+Wtedy równanie \ref{eq:neuronOut} przyjmie postać:
+\begin{equation}
+	\label{eq:neuronVec}
+	a = f\left( w x + b \right)
+\end{equation}
+
+Ponadto istotnym w dalszych rozważaniach elementem modelu neuronu jest wyjście z bloku sumującego.
+Oznaczając je jako $z$ otrzymamy:
+\begin{equation}
+	\label{eq:z}
+	z = \sum\limits_{j=1}^{L}w_{j}x_{j} + b
+\end{equation}
+
+Obliczona w ten sposób wartość, stanowi argument funkcji aktywacji neuronu.
+Funkcja ta przekształca wartość $z$ na inną wartość uzależnioną od jej charakterystyki.
+Na potrzeby projektu, przyjęto że rolę tę będzie pełniła funkcja sigmoidalna (logsig).
+Jej wartość możemy obliczyć zgodnie ze wzorem:
+\begin{equation}
+	\label{eq:sigmoid}
+	f(z) =  \frac{1}{1 +\exp(-z)}
+\end{equation}
+
+W procesie uczenia istotna będzie także wartość pochodnej tej funkcji w danym punkcie.
+W przypadku funkcji sigmoidalnej można ją sprowadzić do następującej postaci:
+\begin{equation}
+	\label{eq:sigmoidPrime}
+	f'(z) = \frac{f(z)}{1-f(z)}
+\end{equation}
+
+
+\subsection{Sieć neuronowa jednowarstwowa}
+Siecią neuronową jednowarstwową nazywamy taką sieć, w której neurony nie są połączone ze sobą bezpośrednio, a jedynie otrzymują dane na wejściu i podają wynik na wyjście.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=12cm]{figures/models/singleLayerModel.png}
+	\caption{Model prostej sieci jednowarstwowej - Placeholder}
+	\label{Fig:singleNetwork}
+\end{figure}
+
+Wejściem każdego neuronu jest wektor sygnałów wejściowych $x$, zaś wyjściem sieci wektor $y = \left[ y_1, y_2, y_3, \cdots, y_L \right]^T$.
+Ponadto możemy zdefiniować również wektor przesunięć $b = \left[ b_1, b_2, \cdots, b_K \right]$
+Liczba wyjść z sieci jest tożsama z liczbą neuronów.
+
+Wagi przyporządkowane wejściom można wyrazić w postaci macierzy o rozmiarach $K \times L$ gdzie $L$ oznacza liczbę wejść sieci, a $K$ liczbę neuronów.
+$$\bm{w} = \left[
+	\begin{array}{cccc}
+		w_{11} & w_{12} & \cdots & w_{1L} \\
+		w_{21} & w_{22} & \cdots & w_{2L} \\
+		\vdots & \vdots &  & \vdots \\
+		w_{K1} & w_{K2} & \cdots & w_{KL} \\
+	\end{array}
+	\right]$$
+
+Przy założeniu że każdy neuron realizuje tą samą funkcję aktywacji, działanie sieci jednowartwowej wielowarstwowej możemy wyrazić w postaci macierzowej:
+\begin{equation}
+	\label{eq:singleLayerOut}
+	y = f\left( wx + b \right)
+\end{equation}
 \subsection{Sieć neuronowa wielowarstwowa}
+Siecią neuronową wielowarstwową, nazywamy taką sieć w której neurony ułożone są w dwóch lub więcej połączonych ze sobą warstwach.
+Możemy zatem powiedzieć że jest to pewna liczba połączonych kaskadowo sieci jednowarstowych, a wyjście pojedynczej warstwy jest równocześnie wejściem warstwy następnej.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=12cm]{figures/models/manyLayerPlaceholder.png}
+	\caption{Model prostej sieci trójwarstwowej - Placeholder}
+	\label{Fig:multiNetwork}
+\end{figure}
+
+W przypadku tego typu sieci ilość macierzy wag jest równa liczbie warstw neuronów.
+Oznaczając $y^{(l)}$ jako wyjście, $w^{(l)}$ jako macierz wag, $b^{(l)}$ jako macierz biasów, a $f^{(l)}$ jako funkcję aktywacji neuronów $l-$tej warstwy oraz wykorzystując równanie \ref{eq:singleLayerOut}, w przypadku sieci trójwarstwowej otrzymamy równania:
+\begin{equation}
+	\label{eq:tripleLayerOut}
+	\begin{aligned}
+		y^{(1)} &= f^{(1)} \left( w^{(1)} x + b^{(1)} \right)\\
+		y^{(2)} &= f^{(2)} \left( w^{(2)} y^{(1)} + b^{(2)} \right)\\
+		y^{(3)} &= f^{(3)} \left( w^{(3)} y^{(2)} + b^{(3)} \right)
+	\end{aligned}
+\end{equation}
+
+Następnie, wykorzystując równania \ref{eq:tripleLayerOut}, możemy opisać działanie całej sieci trójwarstwowej równaniem:
+
+\begin{equation}
+	\label{eq:tripleLayerCombined}
+	y^{(3)} &= f^{(3)} \left( w^{(3)} f^{(2)} \left( w^{(2)} f^{(1)} \left( w^{(1)} x + b^{(1)} \right) + b^{(2)} \right) + b^{(3)} \right)
+\end{equation}
+
 \subsection{Proces uczenia sieci z wykorzystaniem metody gradientowej}
+Celem określenia sposobu uczenia sieci, koniecznym jest uprzednie zdefiniowanie tego, co oznacza określenie sieci ,,nauczoną'' bądź ,,nienauczoną''.
+W tym celu definiujemy tzw. funkcję kosztu, określającą poziom rozbieżności pomiędzy wartością otrzymaną na wyjściu sieci, a wartością oczekiwaną.
+Przykładem takiej funkcji, jest funkcja błędu średniokwadratowego (MSE):
+\begin{equation}
+	\label{eq:costFunction}
+	C\left( w, b, x, a\right) = \frac{1}{2n} \sum\limits_{x} || y\left( x \right) - a ||^2
+\end{equation}
+
+W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$ wszystkich jej biasów, $x$ zbiór danych wejściowych, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór oczekiwanych wyjść z sieci.
+Zakładając, że w procesie uczenia wartości $x$ oraz $a$ pozostają stałe, możemy uprościć oznaczenie funkcji do postaci $C (w,b)$.
+Funkcja ta dąży do 0 gdy wartości otrzymywane na wyjściu sieci są bliskie wartościom oczekiwanym, i rośnie wraz ze wzrostem różnicy pomiędzy nimi.
+W związku z powyższym, należy znaleźć taką metodę, która pozwoli na minimalizację wartości funkcji $C(w,b)$.
+
 \subsubsection{Ogólny algorytm gradientowy}
+Celem zobrazowania problemu rozważmy prostą funkcję $C(v_1, v_2)$ zobrazowaną na rysunku \ref{Fig:simpleCost}.
+Naszym celem jest znalezienie jej globalnego minimum.
+Teoretycznie możliwe jest jego wyznaczenie metodą analityczną, jednakże według literatury \cite{nndl} jest to rozwiązanie mało wydajne, szczególnie gdy rozważymy funkcje więcej niż kilku zmiennych.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=12cm]{figures/models/gradientExample.png}
+	\caption{Przykładowa funkcja 2 zmiennych}
+	\label{Fig:simpleCost}
+\end{figure}
+
+Obserwując rysunek \ref{Fig:simpleCost} możemy jednak dojść do znacznie prostszej obliczeniowo metody.
+Przyjmując bliskie zeru wartości $\Delta v_1$ oraz $\Delta v_2$ możemy przyjąć zmianę wartości funkcji $C(v_1, v_2)$ na poziomie:
+\begin{equation}
+	\label{eq:deltaC}
+	\Delta C \approx \frac{\delta C}{\delta v_1} \Delta v_1 + \frac{\delta C}{\delta v_2} \Delta v_2
+\end{equation}
+
+Na podstawie powyższego równania możemy zdefiniować wektor zmian:
+\begin{equation}
+	\label{eq:changeVector}
+	\Delta v = (\Delta v_1, \Delta v_2)^T
+\end{equation}
+oraz tzw. wektor gradientu:
+\begin{equation}
+	\label{eq:gradientVector}
+	\nabla C = \left(\frac{\delta C}{\delta v_1},\frac{\delta C}{\delta v_1}\right)^T
+\end{equation}
+
+Wykorzystując powyższe definicje, równanie \ref{eq:gradientVector} możemy zapisać w postaci:
+\begin{equation}
+	\label{eq:costGradientVector}
+	\Delta C \approx \nabla C \cdot \Delta v
+\end{equation}
+
+Problemem przy równaniu \ref{eq:costGradientVector} jest wyznaczenie optymalnego wektora $\Delta v$, tak aby zagwarantować ujemną wartość $\Delta C$. W tym celu, możemy przyjąć wartości opisywane równaniem \ref{eq:changeVector} jako równe:
+\begin{equation}
+	\label{eq:lrNabla}
+	\Delta v = -\eta \nabla C
+\end{equation}
+
+Wartość $\eta$ nazywana jest ,,współczynnikiem uczenia'' i przyjmuje bliskie zeru, dodatnie wartości. Wykorzystując powyższą definicję, możemy zapisać równanie \ref{eq:costGradientVector} w postaci:
+\begin{equation*}
+	\begin{aligned}
+		\Delta C &\approx - \eta \nabla C \cdot \nabla C\\
+		\Delta C &\approx - \eta ||\nabla C||^2
+	\end{aligned}
+\end{equation*}
+W tej postaci równania widzimy, że dla odpowiednio niskiego współczynnika $\eta$ zagwarantowany jest spadek wartości funkcji kosztu $C(v)$.
+Wykorzystując właściwość opisaną równaniem \ref{eq:lrNabla} możemy wyznaczyć nowe wartości zmiennych zawartych w wektorze $v$:
+\begin{equation}
+	\begin{aligned}
+		v  \rightarrow v' &= v - \eta \nabla C \\
+		v' &= v + \Delta v
+	\end{aligned}
+\end{equation}
+
+Wielokrotnie aplikując powyższą regułę, jesteśmy w stanie podążać za gradientem aż do osiągnięcia minimum.
+Literatura \cite{nndl} definiuje ją jako ,,algorytm spadku gradient'', ale jednocześnie wspomina że w niektórych sytuacjach, może nie być w pełni skuteczna.
+
+\subsubsection{Zastosowanie algorytmu gradientowego w sieciach wielowarstwowych}
+
+Algorytm gradientowy może zostać wykorzystany do minimalizacji funkcji przedstawionej równaniem \ref{eq:deltaC}, poprzez odnajdowanie wartości wag oraz biasów minimalizujących funkcję kosztu.
+Wykorzystując oznaczenia $w^{(l)}_{ij}$ jako j-tą wagę i-tego neuronu l-tej warstwy oraz $b^{(l)}_i$ jako bias i-tego neuronu w l-tej warstwie, możemy wyznaczyć ich wartości w kolejnych iteracjach (epokach) procesu uczenia:
+\begin{equation}
+	\label{weightUpdate}
+	w^{(l)}_{ij} \rightarrow {w'}^{(l)}_{ij} = w^{(l)}_{ij} - \eta \frac{\delta C}{\delta w^{(l)}_{ij}}
+\end{equation}
+\begin{equation}
+	\label{biasUpdate}
+	b^{(l)}_{i} \rightarrow {b'}^{(l)}_{i} = b^{(l)}_{i} - \eta \frac{\delta C}{\delta b^{(l)}_{i}}
+\end{equation}
+
+Przyjmując jako funkcję kosztu błąd średniokwadratowy, przy założeniu wystąpienia wielu danych uczących, możemy ją zapisać w postaci:
+\begin{equation}
+	C = \frac{1}{n} \sum \limits_x C_x
+\end{equation}
+czyli średniej wartości błędów $C_{x} = \frac{||y(x) - a||^2}{2}$ dla poszczególnych par uczących.
+TODO: Rozpisać wzory na poszczególne pochodne - instrukcja \cite{kiaMultiLayer}
+
+
+
 \subsubsection{Metoda stochastycznego spadku gradientu}
+Jednym z problemów algorytmu spadku gradientu, objawiającym się przy dużej liczbie rekordów uczących \cite{nndl} jest długi czas potrzebny na obliczanie wartości pochodnych w równaniu \ref{eq:gradientVector}.
+Celem zniwelowania tego problemu można wykorzystać metodę zwaną ,,stochastycznym spadkiem gradientu''.
+Polega ona na oszacowaniu rzeczywistego gradientu $\nabla C$ poprzez obliczenie $\nabla C_x$ dla losowo wybranej próbki danych uczących.
+Poprzez odpowiednie dobranie rozmiaru próbek, oraz ich odpowiednie uśrednienie, możemy uzyskać dobre przybliżenie rzeczywistego gradientu $\nabla C$.\cite{nndl}
+
 
 \section{Wstęp/wprowadzenie}
 1 $\div$ 5 stron charakterystyka problematyki w świetle aktualnego stanu wiedzy i~techniki, ze wskazaniem na zagadnienia istotne z punktu widzenia realizowanej pracy.
@@ -417,11 +630,9 @@ Według potrzeb zawarte i uporządkowane uzupełnienie pracy o dowolny materiał
 \addcontentsline{toc}{section}{Literatura}
 
 \begin{thebibliography}{4}
-\bibitem{str} http://weii.portal.prz.edu.pl/pl/materialy-do-pobrania. Dostęp 5.01.2015.
-\bibitem{Jakubczyk1997} Jakubczyk T., Klette A.: Pomiary w akustyce. WNT, Warszawa 1997.
-\bibitem{Barski2011} Barski S.: Modele transmitancji. Elektronika praktyczna, nr 7/2011, str. 15-18.
-\bibitem{dokum} Czujnik S200. Dokumentacja techniczno-ruchowa. Lumel, Zielona Góra, 2001.
-\bibitem{Pawluk2001} Pawluk K.: Jak pisać teksty techniczne poprawnie, Wiadomości Elektrotechniczne, Nr 12, 2001, str. 513-515.
+	\bibitem{kiaMultiLayer} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw9-siec-wielowarstw.pdf (Dostęp 05.06.2022r.)
+	\bibitem{kiaSingleLayer} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw8-siec-jednowarstw.pdf (Dostęp 05.06.2022r.)
+	\bibitem{nndl} Nielsen M.: Neural Networks and Deep Learning. http://neuralnetworksanddeeplearning.com/ (Dostęp. 05.06.2022r.)
 \end{thebibliography}
 
 \clearpage
