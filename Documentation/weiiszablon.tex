@@ -309,6 +309,7 @@ Przyjmując jako funkcję kosztu błąd średniokwadratowy, przy założeniu wys
 	C = \frac{1}{n} \sum \limits_x C_x
 \end{equation}
 czyli średniej wartości błędów $C_{x} = \frac{||y(x) - a||^2}{2}$ dla poszczególnych par uczących.
+
 TODO: Rozpisać wzory na poszczególne pochodne - instrukcja \cite{kiaMultiLayer}
 
 
@@ -318,7 +319,21 @@ Jednym z problemów algorytmu spadku gradientu, objawiającym się przy dużej l
 Celem zniwelowania tego problemu można wykorzystać metodę zwaną ,,stochastycznym spadkiem gradientu''.
 Polega ona na oszacowaniu rzeczywistego gradientu $\nabla C$ poprzez obliczenie $\nabla C_x$ dla losowo wybranej próbki danych uczących.
 Poprzez odpowiednie dobranie rozmiaru próbek, oraz ich odpowiednie uśrednienie, możemy uzyskać dobre przybliżenie rzeczywistego gradientu $\nabla C$.\cite{nndl}
+Elementy pojedynczej próbki możemy oznaczyć jako $X_1, X_2, \ldots , X_m$
+Zakładając odpowiednio duży rozmiar $m$ możemy przyjąć za prawdziwe równanie:
+\begin{equation}
+	\label{eq:stochasticGradient}
+	\frac{ \sum_{j=1}^{m} \nabla C_{X_j}}{m} \approx \frac{ \sum_x \nabla C_x}{n} = \nabla C
+\end{equation}
 
+Przenosząc czynnik $\frac{1}{m}$ przed znak sumy, otrzymamy:
+\begin{equation}
+	\label{eq:stochasticGradientFinal}
+	\nabla C \approx \frac{1}{m} \sum_{j=1}^{m} \nabla C_{X_j}
+\end{equation}
+
+Wartym zauważenia jest też fakt występowania różnych konwencji uśredniania czy też skalowania gradientu stochastycznego. \cite{nndl}
+Niektóre źródła mówią o braku konieczności ich stosowania gdyż wpływają na działanie sieci jedynie pośrednio, poprzez modyfikację wartości współczynnika uczenia.
 
 \section{Wstęp/wprowadzenie}
 1 $\div$ 5 stron charakterystyka problematyki w świetle aktualnego stanu wiedzy i~techniki, ze wskazaniem na zagadnienia istotne z punktu widzenia realizowanej pracy.

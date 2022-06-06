@@ -10,7 +10,7 @@
 \contentsline {subsubsection}{\numberline {2.4.1}Ogólny algorytm gradientowy}{\footnotesize 11}{subsubsection.2.4.1}%
 \contentsline {subsubsection}{\numberline {2.4.2}Zastosowanie algorytmu gradientowego w sieciach wielowarstwowych}{\footnotesize 13}{subsubsection.2.4.2}%
 \contentsline {subsubsection}{\numberline {2.4.3}Metoda stochastycznego spadku gradientu}{\footnotesize 13}{subsubsection.2.4.3}%
-\contentsline {section}{\numberline {3}Wstęp/wprowadzenie}{\footnotesize 13}{section.3}%
+\contentsline {section}{\numberline {3}Wstęp/wprowadzenie}{\footnotesize 14}{section.3}%
 \contentsline {section}{\numberline {4}Tekst zasadniczy -- I}{\footnotesize 15}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Formatowanie rozdziałów i podrozdziałów}{\footnotesize 15}{subsection.4.1}%
 \contentsline {section}{\numberline {5}Tekst zasadniczy -- II}{\footnotesize 16}{section.5}%
