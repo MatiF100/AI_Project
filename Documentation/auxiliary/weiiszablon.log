@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2022.2.11)  13 JUN 2022 22:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2022.2.11)  13 JUN 2022 23:19
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -227,7 +227,9 @@ File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
 File: listings.cfg 2020/03/24 1.8d listings configuration
 ))
 Package: listings 2020/03/24 1.8d (Carsten Heinz)
-
+ (listings-rust.sty
+Package: listings-rust 2018/01/23 Custom Package
+)
 (C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
 (C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
@@ -1808,75 +1810,6 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\abovedisplayskip' on input line 373.
 
 [15]
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:387: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.387 ...ieci neuronowej,label={lst:netStructure}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:387: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.387 ...ieci neuronowej,label={lst:netStructure}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:397: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.397 ...ci neuronowej,label={lst:netConstructor}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:397: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.397 ...ci neuronowej,label={lst:netConstructor}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\<let>-command' on input line 410.
@@ -1946,75 +1879,6 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\abovedisplayskip' on input line 410.
 
 [16]
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:441: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.441 ...j struktury sieci,label={lst:netExample}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:441: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.441 ...j struktury sieci,label={lst:netExample}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:453: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.453 ...na oraz jej pochodna,label={lst:sigmoid}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:453: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.453 ...na oraz jej pochodna,label={lst:sigmoid}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\<let>-command' on input line 456.
@@ -2084,75 +1948,6 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\abovedisplayskip' on input line 456.
 
 [17]
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:478: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.478 ...funkcji feed-forward,label={lst:sigmoid}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:478: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.478 ...funkcji feed-forward,label={lst:sigmoid}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:490: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.490 ...ycznego spadku gradientu,label={lst:sgd}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:490: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.490 ...ycznego spadku gradientu,label={lst:sgd}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\<let>-command' on input line 502.
@@ -2375,40 +2170,6 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\abovedisplayskip' on input line 593.
 
 [20]
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:609: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.609 ...ji walidacji krzyżowej,label={lst:eval}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:609: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.609 ...ji walidacji krzyżowej,label={lst:eval}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\<let>-command' on input line 627.
@@ -2478,40 +2239,6 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\abovedisplayskip' on input line 627.
 
 [21]
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:637: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.637 ...update\_mini\_batch,label={lst:updateMB}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:637: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.637 ...update\_mini\_batch,label={lst:updateMB}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\<let>-command' on input line 674.
@@ -2594,119 +2321,72 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-LaTeX Warning: Reference `lst:backprop' on page \footnotesize 23 undefined on i
-nput line 698.
-
-
-LaTeX Warning: Reference `eq:weightUpdate' on page \footnotesize 23 undefined o
-n input line 699.
-
-
-LaTeX Warning: Reference `eq:biasUpdate' on page \footnotesize 23 undefined on 
-input line 699.
-
-
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
-File: lstlang2.sty 2020/03/24 1.8d listings language file
-)
-(C:\Users\Mateusz\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
-File: lstlang3.sty 2020/03/24 1.8d listings language file
-)
-
-weiiszablon.tex:701: Package Listings Error: Couldn't load requested language.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.701 ... propagacji błędu,label={lst:backprop}]
-                                                  
-The following languages weren't loadable:
-    ,rust$
-This may cause errors in the sequel.
-
-
-weiiszablon.tex:701: Package Listings Error: language rust undefined.
-
-See the Listings package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.701 ... propagacji błędu,label={lst:backprop}]
-                                                  
-The language is not loadable. Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<let>-command' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 718.
+(hyperref)                removing `\@currsize' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@currsize' on input line 718.
+(hyperref)                removing `\abovedisplayskip' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\abovedisplayskip' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\abovedisplayshortskip' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\abovedisplayshortskip' on input line 718.
+(hyperref)                removing `\z@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\z@' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\belowdisplayshortskip' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\belowdisplayshortskip' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\p@' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 718.
+(hyperref)                removing `\<def>-command' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 718.
+(hyperref)                removing `\@listi' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@listi' on input line 718.
+(hyperref)                removing `\belowdisplayskip' on input line 717.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\belowdisplayskip' on input line 718.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\abovedisplayskip' on input line 718.
+(hyperref)                removing `\abovedisplayskip' on input line 717.
 
 [23]
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -2714,71 +2394,71 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 756.
+(hyperref)                removing `\<let>-command' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@currsize' on input line 756.
+(hyperref)                removing `\@currsize' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\abovedisplayskip' on input line 756.
+(hyperref)                removing `\abovedisplayskip' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\abovedisplayshortskip' on input line 756.
+(hyperref)                removing `\abovedisplayshortskip' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\z@' on input line 756.
+(hyperref)                removing `\z@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\belowdisplayshortskip' on input line 756.
+(hyperref)                removing `\belowdisplayshortskip' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\p@' on input line 756.
+(hyperref)                removing `\p@' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 756.
+(hyperref)                removing `\<def>-command' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@listi' on input line 756.
+(hyperref)                removing `\@listi' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\belowdisplayskip' on input line 756.
+(hyperref)                removing `\belowdisplayskip' on input line 754.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\abovedisplayskip' on input line 756.
+(hyperref)                removing `\abovedisplayskip' on input line 754.
 
 [24]
 weiiszablon.tex:785: Misplaced alignment tab character &.
@@ -3223,12 +2903,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 945--946
 
  []
 
-<figures/fig1.png, id=733, 253.69781pt x 179.92218pt>
+<figures/fig1.png, id=737, 253.69781pt x 179.92218pt>
 File: figures/fig1.png Graphic file (type png)
 <use figures/fig1.png>
 Package pdftex.def Info: figures/fig1.png  used on input line 953.
 (pdftex.def)             Requested size: 170.71652pt x 121.07434pt.
-<figures/fig2.png, id=735, 444.15938pt x 213.79875pt>
+<figures/fig2.png, id=739, 444.15938pt x 213.79875pt>
 File: figures/fig2.png Graphic file (type png)
 <use figures/fig2.png>
 Package pdftex.def Info: figures/fig2.png  used on input line 964.
@@ -4033,13 +3713,13 @@ Package rerunfilecheck Info: File `weiiszablon.out' has not changed.
 (rerunfilecheck)             Checksum: E65B821EE91EBB8C2BD767B355382BD9;7393.
  ) 
 Here is how much of TeX's memory you used:
- 15697 strings out of 478584
- 247275 string characters out of 2843457
- 1273846 words of memory out of 3000000
- 33101 multiletter control sequences out of 15000+600000
- 541402 words of font info for 66 fonts, out of 8000000 for 9000
+ 16826 strings out of 478584
+ 258536 string characters out of 2843457
+ 1290485 words of memory out of 3000000
+ 34282 multiletter control sequences out of 15000+600000
+ 541721 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 70i,13n,76p,1242b,1909s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 70i,13n,76p,8041b,2328s stack positions out of 5000i,500n,10000p,200000b,80000s
 {C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}
 {C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C
 :/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}
@@ -4063,11 +3743,12 @@ public/lm/lmri9.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/type1
 /public/lm/lmsy10.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/typ
 e1/public/lm/lmsy9.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/ty
 pe1/public/lm/lmtt10.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/lm/lmtt12.pfb>
+type1/public/lm/lmtt12.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/font
+s/type1/public/lm/lmtti10.pfb>
 Output written on C:/Users\Mateusz\Desktop\RUST\AI_Project\Documentation\out\we
-iiszablon.pdf (40 pages, 1359997 bytes).
+iiszablon.pdf (40 pages, 1377902 bytes).
 PDF statistics:
- 996 PDF objects out of 1000 (max. 8388607)
+ 1004 PDF objects out of 1200 (max. 8388607)
  478 named destinations out of 1000 (max. 500000)
  292 words of extra memory for PDF output out of 10000 (max. 10000000)
 
