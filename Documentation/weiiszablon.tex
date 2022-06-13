@@ -86,7 +86,7 @@ Składa się na niego 101 rekordów opisanych 18 parametrami. Opisują one nast�
 	\item legs - wartość liczbowa, informująca o liczbie nóg danego zwierzęcia
 	\item tail - wartość logiczna, niosąca informację o występowaniu ogona
 	\item domestic - wartość logiczna, określająca czy zwierzę jest uznawane za domowe
-	\item catsize - wartość logiczna, stwierdzająa czy zwierzę jest porównywalne rozmiarem, bądź większe od kota
+	\item catsize - wartość logiczna, o niesprecyzowanej informacji
 	\item type - wartość liczbowa, określająca przynależność zwierzęcia do jednej z siedmiu klas
 \end{enumerate}
 
@@ -155,8 +155,10 @@ W procesie uczenia istotna będzie także wartość pochodnej tej funkcji w dany
 W przypadku funkcji sigmoidalnej można ją sprowadzić do następującej postaci:
 \begin{equation}
 	\label{eq:sigmoidPrime}
-	f'(z) = \frac{f(z)}{1-f(z)}
+	f'(z) = f(z) * 1-f(z)
 \end{equation}
+Co istotne, argumentami tej funkcji są stałe oraz wyliczona wcześniej pochodna w punkcie.
+Właściwość ta może być użyta do zmniejszenia liczby wykonywanych przez algorytm operacji.
 
 
 \subsection{Sieć neuronowa jednowarstwowa}
@@ -296,11 +298,11 @@ Literatura \cite{nndl} definiuje ją jako ,,algorytm spadku gradient'', ale jedn
 Algorytm gradientowy może zostać wykorzystany do minimalizacji funkcji przedstawionej równaniem \ref{eq:deltaC}, poprzez odnajdowanie wartości wag oraz biasów minimalizujących funkcję kosztu.
 Wykorzystując oznaczenia $w^{(l)}_{ij}$ jako j-tą wagę i-tego neuronu l-tej warstwy oraz $b^{(l)}_i$ jako bias i-tego neuronu w l-tej warstwie, możemy wyznaczyć ich wartości w kolejnych iteracjach (epokach) procesu uczenia:
 \begin{equation}
-	\label{weightUpdate}
+	\label{eq:weightUpdate}
 	w^{(l)}_{ij} \rightarrow {w'}^{(l)}_{ij} = w^{(l)}_{ij} - \eta \frac{\delta C}{\delta w^{(l)}_{ij}}
 \end{equation}
 \begin{equation}
-	\label{biasUpdate}
+	\label{eq:biasUpdate}
 	b^{(l)}_{i} \rightarrow {b'}^{(l)}_{i} = b^{(l)}_{i} - \eta \frac{\delta C}{\delta b^{(l)}_{i}}
 \end{equation}
 
@@ -334,6 +336,468 @@ Przenosząc czynnik $\frac{1}{m}$ przed znak sumy, otrzymamy:
 
 Wartym zauważenia jest też fakt występowania różnych konwencji uśredniania czy też skalowania gradientu stochastycznego. \cite{nndl}
 Niektóre źródła mówią o braku konieczności ich stosowania gdyż wpływają na działanie sieci jedynie pośrednio, poprzez modyfikację wartości współczynnika uczenia.
+Z tego też powodu, w dalszej implementacji przyjęto współczynnik równy stosunkowi rozmiaru próbki do rozmiaru całego zbioru uczącego.
+
+\subsubsection{Adaptacyjny współczynnik uczenia}
+W równaniu \ref{eq:lrNabla} wprowadzono pojęcie współczynnika uczenia.
+Standardowa metoda gradientowa zakłada że jest on stały przez cały okres uczenia sieci, a jego odpowiedni dobór jest jednym z kryteriów koniecznych do poprawnego przebiegu procesu uczenia.
+Nie jest to jednak rozwiązanie optymalne, gdyż zbyt duża jego wartość może znacząco utrudnić osiągnięcie minimum funkcji błędu a w skrajnych przypadkach spowodować rozbiegnięcie procesu uczenia.
+Zbyt mała jego wartość również jest niekorzystna gdyż znacznie wydłuża czas potrzebny na osiągnięcie celu uczenia - definiowanego jako minimalizacja funkcji wyrażonej równaniem \ref{eq:costFunction}.
+
+Jedną z metod pozwalających zniwelować ten problem, jest metoda adaptacyjnej korekty współczynnika uczenia $\eta $\cite{kiaAcc}.
+Przyjmując wartość błędu w chwili czasu $t$:
+\begin{equation}
+	\label{eq:costFunctionTimed}
+	MSE(t) = \frac{1}{2n} \sum_{i=1}^{M}  || y_{i}(t) - a(t) ||^2
+\end{equation}
+Możemy zdefiniować sposób korekty współczynnika uczenia jako:
+\begin{equation}
+	\label{eq:adaptiveLR}
+	\eta \left( t + 1 \right)  =
+	\begin{cases}
+		\eta \left( t \right) \cdot \xi_d & \text{gdy } MSE(t) > er \cdot MSE(t-1)\\
+		\eta \left( t \right) \cdot \xi_i & \text{gdy } MSE(t) <  MSE(t-1)\\
+		\eta \left( t \right)  & \text{gdy } MSE(t-1) \leq MSE(t) \leq er \cdot MSE(t-1)
+	\end{cases}
+\end{equation}
+gdzie $\xi_d$ $\xi_i$ są odpowiednio współczynnikami zmniejszania i zwiększania wartości współczynnika uczenia, zaś $er$ określa dopuszczalną krotność przyrostu błędu.
+Podejście takie powoduje wprawdzie konieczność ustalenia dodatkowych parametrów w procesie uczenia, lecz eliminuje problem doboru współczynnika uczenia.
+Jeśli będzie on zbyt duży, zostanie zredukowany do pożądanego poziomu ze względu na wzrastający poziom błedu.
+Jednocześnie zbyt niska wartość $\eta$ zostanie zwiększona kiedy proces uczenia natrafi na bardziej optymalne warunki.
+
+Literatura \cite{nnd} podaje także bardziej skomplikowany wariant zastosowania zmiennego współczynnika uczenia.
+Polega on na dodatkowym zapisywaniu stanu wag oraz biasów przed ich zmianą wynikającą z algorymtu spadku gradientu.
+Wagi te mogą następnie zostać przywrócone jeśli uczenie przyniosło efekt odwrotny do zamierzonego i doszło do wzrostu wartości błędu.
+W praktyce oznacza to przywrócenie zachowanych wag oraz biasów w momencie zmniejszenia $\eta$ o współczynnik \xi_d.
+
+\section{Implementacja algorytmów w języku Rust}
+Przed wykonaniem badań operujących na przedstawionych algorytmach, konieczna była ich implementacja w postaci pozwalającej na proste ustalanie parametrów sieci, oraz jej ewentualne modyfikacje na potrzeby eksperymentów.
+W tym celu wykorzystany został język programowania ogólnego przeznaczenia - Rust, oraz następujące biblioteki:
+\begin{itemize}
+	\item ndarray 0.15.4 - wykorzystywana do obliczeń związanych z algebrą liniową, przede wszystkim operacji na macierzach
+	\item rand 0.8.5 - wykorzystywana do generowania liczb losowych
+\end{itemize}
+Pełny kod gotowy do kompilacji i uruchomienia znajduje się na repozytorium: \url{https://github.com/MatiF100/AI_Project}.
+
+\subsection{Implementacja struktury sieci}
+\subsubsection{Podstawowa struktura reprezentująca sieć}
+Pierwszym krokiem koniecznym do realizacji projektu było wykonanie ogólnej struktury sieci, pozwalającej na ustalenie jej parametrów, oraz funkcji pozwalającej na jej inicjalizację.
+
+
+\begin{lstlisting}[language=Rust,caption=Podstawowa struktura sieci neuronowej,label={lst:netStructure}]
+#[derive(Debug, Clone)]
+struct Network {
+    layers: Vec<usize>,
+    biases: Vec<Array2<f64>>,
+    weights: Vec<Array2<f64>>,
+    name: String,
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=Rust,caption=Konstruktor struktury sieci neuronowej,label={lst:netConstructor}]
+fn new(layers: Vec<usize>) -> Self {
+	let mut rng = rand::thread_rng();
+	let layers = layers
+		.into_iter()
+		.filter(|x| *x > 0)
+		.collect::<Vec<usize>>();
+	Self {
+		name: String::from("Network 0"),
+		//Biases are initialized with random values
+		biases: layers
+			.iter()
+			.skip(1)
+			.map(|&s| {
+				(0..s)
+					.map(|_| rng.gen_range::<f64, std::ops::Range<f64>>(-1.0..1.0))
+					.collect::<Vec<f64>>()
+			})
+			.map(|v| Array2::from_shape_vec((v.len(), 1), v).unwrap())
+			.collect(),
+
+		//Weights are also initialized with random values
+		weights: layers
+			.windows(2)
+			.map(|x| {
+				(
+					(x[0], x[1]),
+					(0..x[0] * x[1])
+						.map(|_| rng.gen_range::<f64, std::ops::Range<f64>>(-1.0..1.0))
+						.collect::<Vec<f64>>(),
+				)
+			})
+			.map(|(x, v)| Array2::from_shape_vec((x.1, x.0), v).unwrap())
+			.collect::<Vec<_>>(),
+		//Layers are moved in from the argument
+		layers,
+	}
+}
+
+\end{lstlisting}
+
+Sieć została zbudowana w sposób dający dużą swobodę w ustalaniu jej parametrów - zarówno liczba warstw jak i neuronów w poszczególnych warstwach może być łatwo modyfikowana przez podanie odpowiedniego wektora jako argumentu.
+
+
+\begin{lstlisting}[language=Rust,caption=Utworzenie przykładowej struktury sieci,label={lst:netExample}]
+fn main(){
+	let (R, S1, S2, S3) = (16, 8, 6, 2);
+	let x = Network::new(vec![R, S1, S2, S3]);
+}
+\end{lstlisting}
+
+Powyższy kod tworzy sieć neuronową o 16 wejściach, 8 neuronach w warstwie 1, 6 neuronach w warstwie drugiej oraz 2 neuronach w warstwie trzeciej.
+Dla uproszczenia kodu i przyspieszenia obliczeń, wejścia sieci są reprezentowane jako dodatkowa warstwa neuronów, których wyjście w trakcie działania sieci jest ustalane do wartości znajdujących się w wektorze wejściowym.
+Również dla uproszczenia kodu, przyjęto stałą funkcję aktywacji dla każdego z neuronów, opisaną równaniem \ref{eq:sigmoid}.
+
+
+\begin{lstlisting}[language=Rust,caption=Funkcja sigmoidalna oraz jej pochodna,label={lst:sigmoid}]
+//Sigmoidal function - basic activation function for neurons
+fn sigmoid<D>(z: Array<f64, D>) -> Array<f64, D>
+where
+    D: Dimension,
+{
+    let mut z = z;
+    z.iter_mut().for_each(|f| *f = 1.0 / (1.0 + (-*f).exp()));
+    z
+}
+
+//Derivative of sigmoidal function
+fn sigmoid_prime<D>(z: Array<f64, D>) -> Array<f64, D>
+where
+    D: Dimension,
+{
+    let val = sigmoid(z);
+    &val * (1.0 - &val)
+}
+\end{lstlisting}
+
+Powyższa implementacja nie jest optymalna, gdyż zakłada obliczanie wartości funkcji aktywacji przy każdym wywołaniu funkcji zwracającej jej pochodną, podczas gdy zwykle wartość ta była już obliczona wcześniej.
+Możliwe jest zatem dalsza optymalizacja kodu, co jednakże nie jest konieczne dla przeprowadzenia większości eksperymentów.
+
+
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji feed-forward,label={lst:sigmoid}]
+fn feed_forward(&self, mut a: Array2<f64>) -> Array2<f64> {
+	for (b, w) in self.biases.iter().zip(self.weights.iter()) {
+		a = sigmoid(w.dot(&a) + b);
+	}
+	return a;
+}
+\end{lstlisting}
+
+Ostatnią funkcją konieczną do działania sieci jest funkcja feedforward, pobierająca dane z wejścia sieci, i zwracająca wynikowy wektor stopnia aktywacji neuronów wyjściowych.
+
+\subsubsection{Algorytm uczenia sieci}
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji stochastycznego spadku gradientu,label={lst:sgd}]
+ fn sgd(
+	&mut self,
+	training_data: &mut Vec<(Array2<f64>, Array2<f64>)>,
+	epochs: usize,
+	mini_batch_size: usize,
+	mut eta: f64,
+	test_data: Option<&Vec<(Array2<f64>, usize)>>,
+	eta_mod: Option<(f64, f64)>,
+	target_cost: f64,
+	report_interval: usize,
+) {
+	let mut rng = rand::thread_rng();
+
+	//Main loop performing learning step with each epoch
+	for j in 1..=epochs {
+		//Randomization of data for usage of mini-batch
+		training_data.shuffle(&mut rng);
+
+		//Generation of mini-batch vector. This is basicaly a collection of smaller datasets
+		let mut mini_batches = training_data
+			.windows(mini_batch_size)
+			.step_by(mini_batch_size)
+			.map(|s| s.to_vec())
+			.collect::<Vec<Vec<_>>>();
+
+		let batch_count = mini_batches.len();
+		// Branching based on existance of adaptive learning rate parameters
+		match eta_mod {
+			Some((dec, inc)) => {
+				// Saving state of network before readjustment of weights and biases
+				let saved_weights = self.weights.clone();
+				let saved_biases = self.biases.clone();
+				let previous_error = self.mse(training_data);
+
+				//Sub-loob performing learning step for each of the mini-batch
+				for mini_batch in &mut mini_batches {
+					//dbg!(&mini_batch);
+					self.update_mini_batch(mini_batch, eta, batch_count)
+				}
+
+				// Verification of newly achieved Mean Square Error
+				let new_error = self.mse(training_data);
+				if new_error < target_cost {
+					if let Some(data) = &test_data {
+						let output = self.evaluate(data);
+						println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
+					}
+					break;
+				}
+				if new_error > previous_error * MAX_PERF_INC {
+					// Restoring backup
+					self.weights = saved_weights;
+					self.biases = saved_biases;
+
+					// Adaptation - learning rate decreases
+					eta *= dec;
+				} else if new_error < previous_error {
+					// Adaptation - learning rate increases
+					eta *= inc;
+				}
+				// else statement does nothing - ommited
+			}
+			None => {
+				//Sub-loob performing learning step for each of the mini-batch
+				for mini_batch in &mut mini_batches {
+					//dbg!(&mini_batch);
+					self.update_mini_batch(mini_batch, eta, batch_count);
+					let new_error = self.mse(training_data);
+					if new_error < target_cost {
+						if let Some(data) = &test_data {
+							let output = self.evaluate(data);
+							println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		//Data verification. Can be ommited
+		if let Some(data) = &test_data {
+			if j + 1 % report_interval == 0 && report_interval != 0 {
+				let output = self.evaluate(data);
+				println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
+			}
+		} else {
+			//println!("Epoch {} complete!", j);
+		}
+	}
+}
+\end{lstlisting}
+
+Powyższy kod realizuje uogólniony przypadek funkcji spadku gradientu.
+W jego ramach można wyróżnić kilka bloków funkcjonalnych.
+Pierwszym z nich jest definicja funkcji spadku gradientu oraz jej parametrów:
+\begin{itemize}
+	\item &mut self - mutowalna referencja do struktury Network, słowo kluczowe self oznacza że funkcja stanowi metodę struktury Network
+	\item training\_data - mutowalna referencja do wektora przechowującego pary uczące
+	\item epochs - maksymalna liczba epok przez które należy wykonywać algorytm
+	\item mini\_batch\_size - rozmiar próbki w metodzie stochastycznej (ustawiona na wartość równą długości wektora training\_data będzie równoważne z brakiem podziału danych uczących)
+	\item mut eta - mutowalna wartość zmiennoprzecinkowa, współczynnik uczenia
+	\item test\_data - opcjonalna referencja do wektora przechowującego dane wykorzystywane do walidacji krzyżowej
+	\item eta\_mod - opcjonalne parametry wykorzystywane w ramach adaptacyjnego współczynnika uczenia
+	\item target\_cost - docelowy błąd
+	\item report\_interval - liczba epok co którą sieć wykonuje walidację krzyżową i wyświetla raport
+\end{itemize}
+
+Następnym etapem, działającym już wewnątrz pętli jest wykonanie  podziału zbioru uczącego na mniejsze próbki (o ile następuje taka konieczność).
+Dalsza część funkcji opiera się na opcjonalnym parametrze eta\_mod.
+Jeśli jest on obecny, wykonywany jest algorytm powiązany z adaptacyjnym współczynnikiem uczenia.
+W każdej iteracji pętli, parametry sieci oraz poprzedni błąd są zapisywane przed wykonaniem operacji uczenia, a następnie w zależności od uzyskanego wyniku, wykonywana jest jedna z operacji opisana w równaniu \ref{eq:adaptiveLR}.
+Jeżeli natomiast nie podano parametrów modyfikacji współczynnika uczenia, wykonywany jest klasyczny algorytm bez przyspieszeń.
+W trakcie uczenia, wykorzystywana jest funkcja update\_mini\_batch(...), którą przedstawiono na listingu \ref{lst:updateMB}.
+
+Ostatnim elementem pętli jest natomiast walidacja krzyżowa.
+Zachodzi jeśli podano zostały podane dane weryfikacyjne, a numer obecnej epoki jest wielokrotnością zadanego interwału raportu.
+Działanie algorytmu walidacji krzyżowej prezentuje listing \ref{lst:eval}
+
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji walidacji krzyżowej,label={lst:eval}]
+fn evaluate(&self, test_data: &Vec<(Array2<f64>, usize)>) -> (usize, usize) {
+	let mut local_data = test_data.clone();
+	let x = local_data
+		.iter_mut()
+		.map(|(x, y)| {
+			(
+				self.feed_forward(x.clone())
+					.iter()
+					.enumerate()
+					.max_by(|(_, a), (_, b)| {
+						a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+					})
+					.map(|(index, _)| index),
+				y,
+			)
+		})
+		.filter(|(a, b)| a.unwrap_or(0) == **b)
+		.count();
+	(test_data.len(), x)
+}
+\end{lstlisting}
+Ponieważ w przyjętej implementacji sieci neuronowej, każdy z neuronów posiada sigmoidalną funkcję aktywacji, konieczne jest zdefiniowanie jednoznacznego sposobu określenia, do jakiej klasy sieć przypisuje obiekt o zadanych parametrach.
+Powyższa implementacja zakłada w tym celu wykorzystanie n neuronów wyjściowych, gdzie n oznacza liczbę istniejących klas.
+Określenie wyniku klasyfikacji odbywa się poprzez funkcję maksimum, zwracającą indeks neuronu wyjściowego o najwyższym stopniu aktywacji.
+Warto zaznaczyć że w powyższej implementacji nie jest istotna sama wartość aktywacji neuronu, a jedynie jej stosunek względem pozostałych neuronów warstwy wyjściowej.
+
+
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji update\_mini\_batch,label={lst:updateMB}]
+fn update_mini_batch(
+	&mut self,
+	mini_batch: &Vec<(Array2<f64>, Array2<f64>)>,
+	eta: f64,
+	batches_count: usize,
+) {
+	// Allocation of gradient vectors
+	let mut nabla_b = self
+		.biases
+		.iter()
+		.map(|b| Array::zeros(b.raw_dim()))
+		.collect::<Vec<Array2<f64>>>();
+	let mut nabla_w = self
+		.weights
+		.iter()
+		.map(|w| Array::zeros(w.raw_dim()))
+		.collect::<Vec<Array2<f64>>>();
+
+	// Loop performing learning iteration over all mini_batches
+	for (x, y) in mini_batch {
+		// Getting updated gradients from backpropagation algorithm
+		let (delta_nabla_b, delta_nabla_w) = self.backprop(x, y);
+
+		// Calculating new gradients with respect to ones created in first steps and also newly calculated ones
+		nabla_b = nabla_b
+			.iter()
+			.zip(delta_nabla_b.iter())
+			.map(|(nb, dnb)| nb + dnb)
+			.collect();
+		nabla_w = nabla_w
+			.iter()
+			.zip(delta_nabla_w.iter())
+			.map(|(nw, dnw)| nw + dnw)
+			.collect();
+	}
+
+	// Calculating new values for weights and biases based on recieved gradients with respect to batch size and learning rate
+	self.weights = self
+		.weights
+		.iter()
+		.zip(nabla_w.iter())
+		.map(|(w, nw)| w - nw * (eta / batches_count as f64) as f64)
+		.collect();
+	self.biases = self
+		.biases
+		.iter()
+		.zip(nabla_b.iter())
+		.map(|(b, nb)| b - nb * (eta / batches_count as f64) as f64)
+		.collect();
+}
+\end{lstlisting}
+Powyższa funkcja oblicza wartości gradientów dla wyodrębnionych w poprzednim etapie algorytmu próbek.
+Parametry przyjmowane przez funkcję to:
+\begin{itemize}
+	\item &mut self - mutowalna referencja do struktury Newtork
+	\item mini\_batch - referencja do próbki danych uczących
+	\item eta - współczynnik uczenia
+	\item batches\_count - liczba wszystkich próbek wyodrębnionych z danych uczących
+\end{itemize}
+
+Funkcja ta alokuje bufor o stałym rozmiarze, a następnie używa go do sumowania gradientów obliczanych dla poszczególnych par uczących w funkcji backprop(...) opisanej listingiem \ref{lst:backprop}.
+Następnie na podstawie obliczonego gradientu wykonywana jest aktualizacja wag. Procedurę realizowaną przez tą funkcję opisują równania \ref{eq:weightUpdate} oraz \ref{eq:biasUpdate}.
+
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji wstecznej propagacji błędu,label={lst:backprop}]
+fn backprop(&self, x: &Array2<f64>, y: &Array2<f64>) -> (Vec<Array2<f64>>, Vec<Array2<f64>>) {
+	//Initialization of gradient vectors.
+	let mut nabla_b = self
+		.biases
+		.iter()
+		.map(|b| Array::zeros(b.raw_dim()))
+		.collect::<Vec<Array2<f64>>>();
+	let mut nabla_w = self
+		.weights
+		.iter()
+		.map(|w| Array::zeros(w.raw_dim()))
+		.collect::<Vec<Array2<f64>>>();
+
+	// Preparing initial information for forward network pass
+	// Because of lifetimes and loop scope further in the function, it is best to make copies of input matrix here
+	let mut activation = x.clone();
+	let mut activations = vec![activation];
+
+	// zs is a Vector of neurons non linear blocks inputs - these will be calculated in the following loop
+	let mut zs: Vec<Array2<f64>> = Vec::new();
+
+	// Performing feedforward operation
+	for (b, w) in self.biases.iter().zip(self.weights.iter()) {
+		// z is the input of non-linear block, necessary in the following gradient calculation
+		let z = w.dot(activations.iter().last().unwrap()) + b;
+		zs.push(z.clone());
+
+		// As the current matrix of non-linear block inputs is calculated, it is passed as argument to the activation function
+		// TODO: in this place other activation functions can be implemented
+		activation = sigmoid(z);
+
+		// Saving the outputs of neuron layer, for later use
+		activations.push(activation);
+	}
+
+	// Calculating per_class or per_output cost of the result at this point, it is also worth noting that the "delta" is only partially calculated
+	// With used notation, the delta itself does not include the eta, or learning rate
+	// Cost derivative function only calculates error, or difference between achieved and expected output
+	// TODO: possibly unnecessary function call
+	let mut delta = Self::cost_derivative(activations.last().unwrap().clone(), y.clone())
+		* sigmoid_prime(zs.last().unwrap().clone());
+
+	// Setting up known values in gradient vectors
+	// Last layer is easiest to calculate, as it does not require any data not available at the moment
+	// We they will be used as we perform the backward pass, calculating bias and weight gradients for every layer
+	*nabla_b.last_mut().unwrap() = delta.clone();
+	*nabla_w.last_mut().unwrap() = delta.dot(&activations[activations.len() - 2].t());
+
+	// Performing backward network pass
+	// Side note: if the book gives example of any identifier as "l" "I" or "L" one should never follow the book and come up with anything that differs from 1
+	for idx in 2..self.layers.len() {
+		// Getting the input of non-linear block for the idx-th layer counting from the end
+		let z = &zs[zs.len() - idx];
+
+		// Calculating the derivative of activation function for given input
+		let derivative = sigmoid_prime(z.clone());
+
+		// Calculating delta - gradient for given layer
+		// TODO: Include the generic formula into readme
+		delta = self.weights[self.weights.len() - idx + 1].t().dot(&delta) * derivative;
+
+		// Boilerplate forced by borrow-checker. Since .len() uses immutable reference, it would block the assignment operation if used inline
+		// Works fine this way though, since usize implements "Copy"
+		let b_len = nabla_b.len();
+		let w_len = nabla_w.len();
+
+		// Actual gradient for biases and weights is pretty similar
+		// The difference is that weight gradient is additionally multiplied by the activation state of given layer
+		nabla_b[b_len - idx] = delta.clone();
+		nabla_w[w_len - idx] = delta.dot(&activations[activations.len() - idx - 1].t());
+	}
+
+	// Returning calculated gradient vectors
+	(nabla_b, nabla_w)
+}
+
+fn cost_derivative(output_activations: Array2<f64>, y: Array2<f64>) -> Array2<f64> {
+	output_activations - y
+}
+\end{lstlisting}
+
+Argumentami powyższej funkcji backprop(...) są kolejno:
+\begin{itemize}
+	\item &self - referencja do struktury Network
+	\item x - wektor parametrów pary uczącej
+	\item y - oczekiwane wyjście dla zadanych parametrów
+\end{itemize}
+Dodatkowo zdefiniowana została funkcja pomocnicza cost\_derivative(...) zwracająca wektor pochodnych funkcji błędu dla każdego z wyjść, względem wyjść neuronów warstwy wyjściowej.
+Dla przyjętej funkcji błędu przyjmuje ona postać różnicy pomiędzy wyjściem sieci, a wyjściem oczekiwanym.
+
+
+W pierwszej kolejności, podobnie jak w funkcji \ref{lst:updateMB} alokowana jest pamięć potrzebna na przechowanie obliczonych gradientów.
+Następnie zostają przygotowane zmienne przechowujące wartości wyjścia (aktywacji) neuronów oraz wejścia funkcji aktywacji.
+Kolejnym krokiem jest obliczenie oraz zachowanie wartości wejść oraz wyjść funkcji aktywacji neuronów w poszczególnych warstwach.
+Po wykonaniu pętli, obliczana jest wartość delta, a na jej podstawie wartości gradientów dla ostatniej warstwy wag oraz biasów.
+W ostatnim kroku, ponownie wykonywana jest pętla, która powtarza poprzedni krok dla pozostałych warstw, obliczając wartości gradientów dla warstw od przedostatniej do pierwszej (wejściowej).
+Obliczone w ten sposób wektory gradientów są następnie zwracane z funkcji.
+
+
 
 \section{Wstęp/wprowadzenie}
 1 $\div$ 5 stron charakterystyka problematyki w świetle aktualnego stanu wiedzy i~techniki, ze wskazaniem na zagadnienia istotne z punktu widzenia realizowanej pracy.
@@ -648,6 +1112,8 @@ Według potrzeb zawarte i uporządkowane uzupełnienie pracy o dowolny materiał
 	\bibitem{kiaMultiLayer} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw9-siec-wielowarstw.pdf (Dostęp 05.06.2022r.)
 	\bibitem{kiaSingleLayer} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw8-siec-jednowarstw.pdf (Dostęp 05.06.2022r.)
 	\bibitem{nndl} Nielsen M.: Neural Networks and Deep Learning. http://neuralnetworksanddeeplearning.com/ (Dostęp. 05.06.2022r.)
+	\bibitem{kiaAcc} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw10-przysp-uczenia.pdf (Dostęp 13.06.2022r.)
+	\bibitem{nnd} Hagan T.M., Demuth H.B., Beale M.H.: Neural Network Design. https://hagan.okstate.edu/NNDesign.pdf (Dostęp 13.06.2022r.)
 \end{thebibliography}
 
 \clearpage
