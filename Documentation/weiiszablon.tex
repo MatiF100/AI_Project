@@ -797,7 +797,567 @@ Po wykonaniu pętli, obliczana jest wartość delta, a na jej podstawie wartośc
 W ostatnim kroku, ponownie wykonywana jest pętla, która powtarza poprzedni krok dla pozostałych warstw, obliczając wartości gradientów dla warstw od przedostatniej do pierwszej (wejściowej).
 Obliczone w ten sposób wektory gradientów są następnie zwracane z funkcji.
 
+\subsubsection{Skrypt ładujący dane}
+Elementem niezbędnym do wykonania badań było dostosowanie zadanego zbioru danych ZOO do wymagań sieci.
+W tym celu wykonano dodatkowy moduł programu, w którym zdefiniowane zostały odpowiednie funkcje.
+Zawartość modułu przedstawia listing \ref{lst:loadData}.
 
+
+
+\begin{lstlisting}[language=Rust,caption=Moduł odpowiedzialny za załadowanie oraz przygotowanie danych,label={lst:loadData}]
+use ndarray::{arr2, Array2};
+
+#[derive(Debug, Default, Clone)]
+pub struct Animal {
+    name: String,
+    hair: f64,
+    feathers: f64,
+    eggs: f64,
+    milk: f64,
+    airborne: f64,
+    aqatic: f64,
+    predator: f64,
+    toothed: f64,
+    backbone: f64,
+    breathes: f64,
+    venomous: f64,
+    fins: f64,
+    legs: f64,
+    tail: f64,
+    domestic: f64,
+    catsize: f64,
+    ani_type: u8,
+}
+
+impl Animal {
+    #[allow(dead_code)]
+    pub fn even_list(mut vector: Vec<Self>) -> Vec<Self> {
+        let mut classes = [0; 7];
+        let limit = 9;
+
+        vector = vector
+            .into_iter()
+            .filter(|a| {
+                classes[a.ani_type as usize] += 1;
+                classes[a.ani_type as usize] <= limit
+            })
+            .collect::<Vec<_>>();
+        vector
+    }
+    pub fn partitioned_list(vector: Vec<Self>, training_ratio: f64) -> (Vec<Self>, Vec<Self>) {
+        let mut classes: [usize; 7] = [0; 7];
+        vector
+            .iter()
+            .for_each(|v| classes[v.ani_type as usize] += 1);
+        let mut limits: [usize; 7] = classes
+            .iter()
+            .map(|&count| (count as f64 * training_ratio).round() as usize)
+            .collect::<Vec<usize>>()
+            .try_into()
+            .unwrap();
+
+        let mut train_v: Vec<Self> = Vec::with_capacity(limits.iter().sum());
+        let mut ver_v: Vec<Self> = Vec::with_capacity(vector.len() - limits.iter().sum::<usize>());
+
+        vector.into_iter().for_each(|val| {
+            let idx = val.ani_type as usize;
+            if limits[idx] > 0 {
+                limits[idx] -= 1;
+                train_v.push(val);
+            } else {
+                ver_v.push(val);
+            }
+        });
+
+        (train_v, ver_v)
+    }
+
+    pub fn new_list(dataset: &str) -> Vec<Animal> {
+        let mut values = dataset
+            .lines()
+            .map(|l| l.split(',').collect::<Vec<&str>>())
+            .map(|v| Self::from_str(v))
+            .collect::<Vec<_>>();
+        //println!("{:?}", values[1]);
+        //
+
+        //values = Self::even_list(values);
+
+        let max = values.iter().map(|a| a.legs as u8).max().unwrap();
+        let min = values.iter().map(|a| a.legs as u8).min().unwrap();
+
+        values
+            .iter_mut()
+            .for_each(|a| a.legs = (a.legs as u8 - min) as f64 / (max - min) as f64);
+
+        values
+    }
+    fn from_str(data: Vec<&str>) -> Self {
+        let mut an: Self = Default::default();
+        let mut it = data.iter();
+        an.name = it.next().unwrap().to_string();
+        an.hair = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.feathers = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.eggs = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.milk = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.airborne = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.aqatic = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.predator = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.toothed = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.backbone = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.breathes = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.venomous = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.fins = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.legs = it.next().unwrap().parse::<f64>().unwrap();
+        an.tail = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.domestic = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.catsize = match *it.next().unwrap() {
+            "0" => 0.0,
+            _ => 1.0,
+        };
+        an.ani_type = it.next().unwrap().parse::<u8>().unwrap() - 1;
+
+        an
+    }
+    pub fn into_training_arr2(&self) -> (Array2<f64>, Array2<f64>) {
+        (
+            arr2(&[[
+                self.hair,
+                self.feathers,
+                self.eggs,
+                self.milk,
+                self.airborne,
+                self.aqatic,
+                self.predator,
+                self.toothed,
+                self.backbone,
+                self.breathes,
+                self.venomous,
+                self.fins,
+                self.legs as f64,
+                self.tail,
+                self.domestic,
+                self.catsize,
+            ]])
+            .t()
+            .to_owned(),
+            Array2::from_shape_vec(
+                (7, 1),
+                (0..7)
+                    .map(|x| if x == self.ani_type { 1.0 } else { 0.0 })
+                    .collect::<Vec<f64>>(),
+            )
+            .unwrap(),
+        )
+    }
+}
+
+\end{lstlisting}
+
+Struktura Animal przedstawiona na listingu \ref{lst:loadData} pozwala na przechowanie rekordów uczących w postaci obiektów, co ułatwia dalszą manipulację nimi.
+Powiązane z nią funkcje pozwalają na utworzenie nowej listy zwierząt na bazie danych odczytanych z pliku oraz jej konwersję do formatu wymaganego przez sieć neuronową zaprezentowaną na listingu \ref{lst:netStructure}.
+
+
+\section{Eksperymenty}
+Eksperymenty którym poddawane były sieci, miały na celu zbadanie poprawności implementacji algorytmów, a także późniejsze badania ich wydajności oraz wpływu szeregu zmiennych na proces uczenia.
+Celem przygotowania struktury sieci do eksperymentów, zmodyfikowane zostały jej elementy mogące wpływać niekorzystnie na powtarzalność wyników.
+Przy uczeniu sieci o stałej liczbie neuronów wykonywana była głęboka kopia całej struktury, co pozwoliło na zapewnienie jednolitych warunków startowych.
+Ponadto pseudolosowy generator wag, został zastąpiony generatorem pseudolosowym o ustalonym ziarnie.
+Pozwoliło to na zapewnienie zbliżonych warunków startowych również dla sieci o różnej liczbie neuronów.
+
+Ze względu na dużą liczbę planowanych eksperymentów, przystosowano kod testujący do równoczesnego działania na wielu rdzeniach procesora.
+W tym celu wykorzystano mechanizm wątków oraz system komunikacji kolejkowej ,,Multi-producer, single-consumer'' co prezentuje listing \ref{lst:mpsc}.
+
+\begin{lstlisting}[language=Rust,caption=Przykładowy skrypt eksperymentalny,label={lst:mpsc}]
+	fn main() {
+
+    //Vector for learning data
+    let t_data: Vec<(Array2<f64>, Array2<f64>)>;
+    //Vector for validation data
+    let v_data: Vec<(Array2<f64>, Array2<f64>)>;
+
+    let data = std::fs::read_to_string("zoo.data");
+
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = data::Animal::partitioned_list(animal_list, 0.75);
+    t_data = animal_list
+        .0
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    v_data = animal_list
+        .1
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    let data_len = t_data.len();
+    let test_data = v_data
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
+
+    println!("Learning record count: {}", t_data.len());
+    let lr_step = vec![
+        0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96,
+        0.97, 0.98, 0.99, 10.0,
+    ];
+    let lr_inc_step = vec![
+        1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4,
+    ];
+    let lr_dec_step = vec![
+        0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
+    ];
+    let er_step = vec![
+        1.0, 1.001, 1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.09, 1.1, 1.15, 1.2, 1.25,
+        1.3, 1.4, 1.5,
+    ];
+
+    let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
+    let (sync_tx, sync_rx) = mpsc::sync_channel(16);
+    let (tx, rx) = mpsc::channel();
+
+    let tmp_threads = threads.clone();
+    thread::spawn(move || {
+        for s1 in 0..t_data.len() / 3 - 7 {
+            for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+                if s2 == 0 && s1 != 0 {
+                    continue;
+                }
+                let x = Network::new(vec![16, s1, s2, 7]);
+                //for lr in &lr_step {
+                for er in &er_step {
+                    let lr = 0.3;
+                    for lr_dec in &lr_dec_step {
+                        for lr_inc in &lr_inc_step {
+                            let mut net = x.clone();
+                            net.name = format!("{},{},{},{},{},{}", s1, s2, lr, lr_dec, lr_inc, er);
+                            let mut t_data = t_data.clone();
+                            let test_data = test_data.clone();
+
+                            let local_lrs = (lr, *lr_dec, *lr_inc);
+                            let local_sync_tx = sync_tx.clone();
+                            let local_tx = tx.clone();
+                            let local_er = *er;
+
+                            local_sync_tx.send(()).unwrap();
+                            let inner_threads = std::sync::Arc::clone(&tmp_threads);
+
+                            *inner_threads.lock().unwrap() += 1;
+                            thread::spawn(move || {
+                                net.sgd(
+                                    &mut t_data,
+                                    1000,
+                                    data_len,
+                                    local_lrs.0,
+                                    Some(&test_data),
+                                    Some((local_lrs.1, local_lrs.2)),
+                                    0.25 / t_data.len(),
+                                    1000,
+                                    Some(local_er),
+                                );
+                                local_tx.send(()).unwrap();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    loop {
+        let threads = std::sync::Arc::clone(&threads);
+        //println!("{}", threads.lock().unwrap());
+        rx.recv().unwrap();
+        //println!("{}", threads.lock().unwrap());
+        sync_rx.recv().unwrap();
+        *threads.lock().unwrap() -= 1;
+        if *threads.lock().unwrap() <= 0 {
+            break;
+        }
+    }
+
+}
+\end{lstlisting}
+
+\subsection{Seria 1 - Testy poprawności działania implementacji sieci}
+Celem pierwszej serii eksperymentów była weryfikacja poprawności implementacji struktury sieci oraz algorytmów jej uczenia.
+W tym celu zastosowano proces uczenia dla prostych przypadków 2-wejściowych bramek logicznych AND, OR oraz XOR.
+W jej trakcie odnotowano niespodziewaną, istotną dla dalszych testów cechę implementacji.
+Prawodpodobnie z powodu przyjęcia funkcji sigmoidalnej dla neuronów warstwy wyjściowej oraz sposobu interpretacji zwracanej przez sieć wyników, ustalenie granicy błędu docelowego na równą
+\begin{equation*}
+    \text{err\_goal} = 0.25 / n
+\end{equation*}
+Przy $n$ oznaczającym długość zbioru uczącego, powodowało występowanie dużej liczby błędów podczas walidacji działania sieci, nawet na zbiorze uczącym.
+Dalsze testy wykazały zwiększenie efektywności wskazań sieci przy kilkukrotnym zmniejszeniu wartości błędu docelowego.
+Wynik 100\% poprawnej klasyfikacji był osiągany regularnie, dla różnych warunków startowych, przy wartości $\text{err\_goal} = \frac{0.25}{2n}$
+Z tego powodu, w części kolejnych eksperymentów również przyjmowano niższe wartości błędu docelowego.
+
+
+\begin{lstlisting}[language=Rust,caption=Skrypt uczący dla bramki logicznej XOR,label={lst:example_xor}]
+	fn main() {
+    let mut x = Network::new(vec![2, 4, 2]);
+    let xor = vec![
+        (
+            Array2::from_shape_vec((2, 1), vec![0.0, 0.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![0.0, 1.0]).unwrap(),
+        ),
+        (
+            Array2::from_shape_vec((2, 1), vec![0.0, 1.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+        ),
+        (
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+        ),
+        (
+            Array2::from_shape_vec((2, 1), vec![1.0, 1.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![0.0, 1.0]).unwrap(),
+        ),
+    ];
+    let test_data = xor
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
+    x.sgd(
+        &mut xor.clone(),
+        2000,
+        4,
+        0.6,
+        Some(&test_data),
+        //None,
+        Some((0.95, 1.02)),
+        0.25 / 8.0,
+        1,
+        None
+    );
+}
+\end{lstlisting}
+Powyższy eksperyment wykazał również konieczność zastosowania więcej niż 1 warstwy neuronów dla problemów nieseparowalnych liniowo.
+Zastosowanie jedynie 1 warstwy sprawdziło się zarówno w przypadku bramki AND jak i OR, lecz w przypadku XOR sieć utrzymywała poziom 50\% poprawności klasyfikacji.
+%TODO: wykres?
+
+\subsection{Seria 2 - Badanie wpływu metaparametrów sieci na przebieg oraz wynik procesu uczenia}
+W tej serii eksperymentów przetestowano 520 520 różnych konfiguracji sieci neuronowych.
+Przyjęto też arbitralne ziarno generatora liczb losowych, dla którego sieć wykazywała nienajlepsze efekty uczenia.
+Takie podejście pozwoliło na lepszą obserwację wpływu parametrów na przebieg uczenia, niż w przypadku zestawu parametrów sieci gwarantujących pełną poprawność w większości sytuacji.
+Modyfikację przykładowego kodu wykorzystaną do ich przeprowadzenia prezentuje listing \ref{lst:test1}.
+
+\begin{lstlisting}[language=Rust,caption=Modyfikacja kodu tworzącego instancje sieci na potrzeby eksperymentu,label={lst:test1}]
+    thread::spawn(move || {
+        for s1 in 0..t_data.len() / 3 - 7 {
+            for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+                if s2 == 0 && s1 != 0 {
+                    continue;
+                }
+                let x = Network::new(vec![16, s1, s2, 7]);
+                for lr in &lr_step {
+                    let lr = 0.3;
+                    for lr_dec in &lr_dec_step {
+                        for lr_inc in &lr_inc_step {
+                            let mut net = x.clone();
+                            net.name = format!("{},{},{},{},{},{}", s1, s2, lr, lr_dec, lr_inc, er);
+                            let mut t_data = t_data.clone();
+                            let test_data = test_data.clone();
+
+                            let local_lrs = (lr, *lr_dec, *lr_inc);
+                            let local_sync_tx = sync_tx.clone();
+                            let local_tx = tx.clone();
+                            let local_er = *er;
+
+                            local_sync_tx.send(()).unwrap();
+                            let inner_threads = std::sync::Arc::clone(&tmp_threads);
+
+                            *inner_threads.lock().unwrap() += 1;
+                            thread::spawn(move || {
+                                net.sgd(
+                                    &mut t_data,
+                                    1000,
+                                    data_len,
+                                    local_lrs.0,
+                                    Some(&test_data),
+                                    Some((local_lrs.1, local_lrs.2)),
+                                    0.25 / t_data.len(),
+                                    1000,
+                                    None
+                                );
+                                local_tx.send(()).unwrap();
+                            });
+                        }
+                    }
+            }
+        }
+    });
+\end{lstlisting}
+
+Ponieważ w trakcie tego eksperymentu nie sprawdzano parametru MAX\_PERF\_INC celem uniknięcia dalszego zwiększania liczby sieci do przetestowania, jego wartość przyjęto jako stałą równą $1.05$
+
+\subsubsection{Wpływ liczby neuronów na efektywność uczenia}
+Dane pozyskane w wyniku eksperymentu pozwoliły na wygenerowanie 2889 wykresów zależności poprawności klasyfikacji w zależności od S1 oraz S2, przy zadanych parametrach współczynnika uczenia.
+Analizując je widzimy dużą skuteczność procesu uczenia dla sieci 2-warstwowych.
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/S1S2_1.png}
+	\caption{Wykres zależności poprawności klasyfikacji od S1 oraz S2 przy lr = 0.2, lr\_inc = 1.05, lr\_dec = 0.9}
+	\label{Fig:S1S2_1}
+\end{figure}
+
+W przypadku sieci 2-warstwowych, pełną poprawność klasyfikacji zazwyczaj obserwujemy przy mniej niż 1000 epokach, co nie ma miejsca w przypadku sieci 3-warstwowej.
+Sieć 3-warstwowa osiągała 100\% poprawność klasyfikacji jedynie w pojedynczych przypadkach.
+Może to sugerować że następuje przewymiarowanie sieci i traci ona zdolność uogólniania.
+Alternatywnie, możliwym jest także konieczność dłuższego uczenia takiej sieci.
+Wizualizację wyników testu widzimy na rysunku \ref{Fig:S1S1_1}.
+Podobne wyniki uzyskano dla znacznej większości spośród wszystkich przetestowanych sieci.
+
+Interesujący efekt został natomiast uzyskany dla niskiego wyjścoiwego współczynnika uczenia.
+Charakterystyczny dla sieci z niskim współczynnikiem uczenia jest wykres \ref{Fig:S1S2_2}.
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/S1S2_2.png}
+	\caption{Wykres zależności poprawności klasyfikacji od S1 oraz S2 przy lr = 0.0001, lr\_inc = 1.25, lr\_dec = 0.93}
+	\label{Fig:S1S2_2}
+\end{figure}
+
+W jego przypadku widzimy silną punktowość sieci.
+Poprawność klasyfikacji przy niektórych ilościach neuronów w poszczególnych warstwach jest podobna jak w eksperymentach z wyższym współczynnikiem uczenia, zaś w innych spada poniżej 40\%.
+Prawdopodobną przyczyną jest duża podatność takiej sieci na parametry początkowe, zwłaszcza dobór wag.
+Mimo inicjalizacji generatora pseudolosowego stałym ziarnem, stan wag może być mniej lub bardziej odległy od optymalnego w zależności od liczby neuronów w poszczególnych warstwach.
+
+\subsubsection{Wpływ modyfikatorów współczynnika uczenia na poprawność klasyfikacji}
+Poprzez modyfikatory współczynnika uczenia rozumie się parametry lr\_inc oraz lr\_dec, wykorzystywane przy adaptacyjnej aktualizacji współczynnika uczenia.
+Powstałe na ich podstawie wykresy pokazują ponadto poziom efektywności sieci o zadanej liczbie neuronów.
+Rysunek \ref{Fig:IncDec1} prezentuje rozkład charakterystyczny dla sieci jednowarstwowych
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_1.png}
+	\caption{Wykres zależności poprawności klasyfikacji od modyfikatorów lr, przy lr~=~0.7 dla sieci jednowarstwowej}
+	\label{Fig:IncDec1}
+\end{figure}
+
+Widzimy że najlepsza poprawność klasyfikacji wystąpiła dla małych wartości współczynnika lr\_inc.
+Współczynnik lr\_dec w tym przypadku nie miał zauważalnego wpływu.
+Podobnie w przypadku większości sieci dwuwarstwowych, efekt modyfikatorów był mało zauważalny, co przedstawia rysunek \ref{Fig:IncDec2}.
+W tym przypadku jednakże, powodem jest ogólnie duża skuteczność sieci jednowarstwowych.
+Większość z nich z łatwością osiąga pełną poprawność klasyfikacji, występują jedynie pojedyncze odchyły bez widocznej zależności.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_2.png}
+	\caption{Wykres zależności poprawności klasyfikacji od modyfikatorów lr, przy lr~=~0.7 dla sieci dwuwarstwowej przy S1 = 3}
+	\label{Fig:IncDec2}
+\end{figure}
+
+Interesujące zjawisko możemy jednak zaobserwować przy liczbie neuronów większej od 13, co zaprezentowano na rysunku \ref{Fig:IncDec3}.
+W takiej sytuacji, następuje gwałtowny spadek poprawności klasyfikacji przez sieć dwuwarstwową.
+Prawdopodobną przyczyną jest przewymiarowanie sieci i jej zbyt duża specjalizacja w klasyfikacji.
+W efekcie sieć traci zdolność uogólniającą i nie reaguje poprawnie na dane których nie wykorzystywano podczas uczenia.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_3.png}
+	\caption{Wykres zależności poprawności klasyfikacji od modyfikatorów lr, przy lr~=~0.96 dla sieci dwuwarstwowej przy S1 = 14}
+	\label{Fig:IncDec3}
+\end{figure}
+
+
+Również interesujące zjawisko prezentuje rysunek \ref{Fig:IncDec4}.
+Widzimy na nim całkowicie stałą poprawność klasyfikacji niezależnie od pozostałych parametrów.
+Co więcej, taki wykres występuje wielokrotnie i wyłącznie przy wartościach początkowych współczynnika uczenia mniejszych niż 0,001.
+Sugeruje to że wartość taka jest już zbyt mała, i pomimo zastosowania  metody adaptacyjnej sieć nie jest w stanie pokonać minimum lokalnego funkcji błędu, bądź też zadana liczba epok jest zbyt mała aby mogło dojść do efektywnego nauczenia sieci.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_4.png}
+	\caption{Płaski wykres występujący przy niskim początkowym współczynniku uczenia}
+	\label{Fig:IncDec4}
+\end{figure}
+
+Skuteczność adaptacyjnego współczynnika uczenia objawia się najbardziej w sieciach 3-warstwowych.
+Przykładowy wynik uczenia dla takiej sieci obrazuje wykres \ref{Fig:IncDec5}.
+W tym przypadku wpływ wartości parametrów adaptacyjnych jest dużo bardziej widoczny niż w poprzednich przykładach.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_5.png}
+	\caption{Zależność poprawności klasyfikacji od parametrów adaptacyjnych przy lr~=~0.2, S1~=~3 oraz S2~=~10}
+	\label{Fig:IncDec5}
+\end{figure}
+
+Widzimy że dla osiągnięcia najwyższej skuteczności, istotnym jest ustalenie odpowiedniej wartości obu parametrów.
+Jeśli będziemy modyfikować tylko jeden z nich, a drugi pozostawimy bliski jedności, widzimy brak wymiernych zysków, a nawet pogorszenie dokładności klasyfikacji.
+Ponadto widzimy że niewielkie wartości współczynników nie wpływały w stopniu znacznym na ostateczny wynik testu.
+
+\clearpage
 
 \section{Wstęp/wprowadzenie}
 1 $\div$ 5 stron charakterystyka problematyki w świetle aktualnego stanu wiedzy i~techniki, ze wskazaniem na zagadnienia istotne z punktu widzenia realizowanej pracy.

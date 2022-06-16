@@ -1,5 +1,5 @@
 use ndarray::{Array, Array2, Dimension};
-use rand::{prelude::SliceRandom, Rng};
+use rand::{prelude::SliceRandom, Rng, SeedableRng};
 
 use std::sync::mpsc;
 use std::thread;
@@ -43,7 +43,8 @@ struct Network {
 impl Network {
     //Constructor
     fn new(layers: Vec<usize>) -> Self {
-        let mut rng = rand::thread_rng();
+        //let mut rng = rand::thread_rng();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(167788);
         let layers = layers
             .into_iter()
             .filter(|x| *x > 0)
@@ -56,7 +57,7 @@ impl Network {
                 .skip(1)
                 .map(|&s| {
                     (0..s)
-                        .map(|_| rng.gen_range::<f64, std::ops::Range<f64>>(-1.0..1.0))
+                        .map(|_| rng.gen_range::<f64, std::ops::Range<f64>>(-0.5..0.5))
                         .collect::<Vec<f64>>()
                 })
                 .map(|v| Array2::from_shape_vec((v.len(), 1), v).unwrap())
@@ -69,7 +70,7 @@ impl Network {
                     (
                         (x[0], x[1]),
                         (0..x[0] * x[1])
-                            .map(|_| rng.gen_range::<f64, std::ops::Range<f64>>(-1.0..1.0))
+                            .map(|_| rng.gen_range::<f64, std::ops::Range<f64>>(-0.5..0.5))
                             .collect::<Vec<f64>>(),
                     )
                 })
@@ -99,7 +100,7 @@ impl Network {
             // Calculating error for each training pair (quadratic cost)
             .map(|v| (v.0 - v.1).fold(0.0, |_, val| val.powf(2.0)) / 2.0)
             // Calculating Mean Squared Error - average squared cost over all training pairs
-            .map(|e| e.powf(2.0))
+            //.map(|e| e.powf(2.0))
             .sum::<f64>()
             / training_data.len() as f64
     }
@@ -156,8 +157,8 @@ impl Network {
                     }
                     if new_error > previous_error * MAX_PERF_INC {
                         // Restoring backup
-                        self.weights = saved_weights;
-                        self.biases = saved_biases;
+                        //self.weights = saved_weights;
+                        //self.biases = saved_biases;
 
                         // Adaptation - learning rate decreases
                         eta *= dec;
@@ -353,12 +354,61 @@ impl Network {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let mut x = Network::new(vec![2,2]);
+    let or = vec![
+        (
+            Array2::from_shape_vec((2, 1), vec![0.0, 0.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![0.0, 1.0]).unwrap(),
+        ),
+        (
+            Array2::from_shape_vec((2, 1), vec![0.0, 1.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+        ),
+        (
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+        ),
+        (
+            Array2::from_shape_vec((2, 1), vec![1.0, 1.0]).unwrap(),
+            Array2::from_shape_vec((2, 1), vec![1.0, 0.0]).unwrap(),
+        ),
+    ];
+    let test_data = or
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
+    x.sgd(
+        &mut or.clone(),
+        2000,
+        4,
+        0.6,
+        Some(&test_data),
+        //None,
+        Some((0.95, 1.02)),
+        0.25 / 8.0,
+        1,
+    );
+    dbg!(x.feed_forward(Array2::<f64>::from_shape_vec((2, 1), vec![-5.0,0.0]).unwrap()));
+    dbg!(x.feed_forward(Array2::<f64>::from_shape_vec((2, 1), vec![0.0,1.3]).unwrap()));
+    dbg!(x.feed_forward(Array2::<f64>::from_shape_vec((2, 1), vec![1.0,0.0]).unwrap()));
+    dbg!(x.feed_forward(Array2::<f64>::from_shape_vec((2, 1), vec![1.0,1.0]).unwrap()));
     //let x = Network::new(vec![16, 8, 7]);
 
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
 
+    /*
     //Vector for learning data
     let t_data: Vec<(Array2<f64>, Array2<f64>)>;
     //Vector for validation data
@@ -400,17 +450,17 @@ fn main() {
 
     println!("Learning record count: {}", t_data.len());
     let lr_step = vec![
-        0.0001, 0.001, 0.01,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 10.0,
+        0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 10.0,
     ];
     let lr_inc_step = vec![
-        1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4,
+        1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4,
     ];
     let lr_dec_step = vec![
-        0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
+        0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
     ];
 
     let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
-    let (sync_tx, sync_rx) = mpsc::sync_channel(1);
+    let (sync_tx, sync_rx) = mpsc::sync_channel(4);
     let (tx, rx) = mpsc::channel();
 
     let tmp_threads = threads.clone();
@@ -440,14 +490,15 @@ fn main() {
                             thread::spawn(move || {
                                 net.sgd(
                                     &mut t_data,
-                                    5000,
+                                    10000,
                                     data_len,
                                     local_lrs.0,
                                     Some(&test_data),
                                     //None
                                     Some((local_lrs.1, local_lrs.2)),
-                                    0.00001,
-                                    1,
+                                    0.25 / data_len as f64,
+                                    //0.00001,
+                                    10000,
                                 );
                                 local_tx.send(()).unwrap();
                             });
@@ -469,7 +520,7 @@ fn main() {
             break;
         }
     }
-
+    */
     /*
     x.sgd(
         &mut t_data,
