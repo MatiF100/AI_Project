@@ -475,7 +475,7 @@ Powyższa implementacja nie jest optymalna, gdyż zakłada obliczanie wartości 
 Możliwe jest zatem dalsza optymalizacja kodu, co jednakże nie jest konieczne dla przeprowadzenia większości eksperymentów.
 
 
-\begin{lstlisting}[language=Rust,caption=Realizacja funkcji feed-forward,label={lst:sigmoid}]
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji feed-forward,label={lst:feedforward}]
 fn feed_forward(&self, mut a: Array2<f64>) -> Array2<f64> {
 	for (b, w) in self.biases.iter().zip(self.weights.iter()) {
 		a = sigmoid(w.dot(&a) + b);
@@ -1134,6 +1134,7 @@ W tym celu wykorzystano mechanizm wątków oraz system komunikacji kolejkowej ,,
 }
 \end{lstlisting}
 
+\clearpage
 \subsection{Seria 1 - Testy poprawności działania implementacji sieci}
 Celem pierwszej serii eksperymentów była weryfikacja poprawności implementacji struktury sieci oraz algorytmów jej uczenia.
 W tym celu zastosowano proces uczenia dla prostych przypadków 2-wejściowych bramek logicznych AND, OR oraz XOR.
@@ -1202,6 +1203,7 @@ Powyższy eksperyment wykazał również konieczność zastosowania więcej niż
 Zastosowanie jedynie 1 warstwy sprawdziło się zarówno w przypadku bramki AND jak i OR, lecz w przypadku XOR sieć utrzymywała poziom 50\% poprawności klasyfikacji.
 %TODO: wykres?
 
+\clearpage
 \subsection{Seria 2 - Badanie wpływu metaparametrów sieci na przebieg oraz wynik procesu uczenia}
 W tej serii eksperymentów przetestowano 520 520 różnych konfiguracji sieci neuronowych.
 Przyjęto też arbitralne ziarno generatora liczb losowych, dla którego sieć wykazywała nienajlepsze efekty uczenia.
@@ -1242,7 +1244,7 @@ Modyfikację przykładowego kodu wykorzystaną do ich przeprowadzenia prezentuje
                                     local_lrs.0,
                                     Some(&test_data),
                                     Some((local_lrs.1, local_lrs.2)),
-                                    0.25 / t_data.len(),
+                                    0.25 / t_data.len() as f64 / 2.0,
                                     1000,
                                     None
                                 );
@@ -1257,6 +1259,7 @@ Modyfikację przykładowego kodu wykorzystaną do ich przeprowadzenia prezentuje
 
 Ponieważ w trakcie tego eksperymentu nie sprawdzano parametru MAX\_PERF\_INC celem uniknięcia dalszego zwiększania liczby sieci do przetestowania, jego wartość przyjęto jako stałą równą $1.05$
 
+\clearpage
 \subsubsection{Wpływ liczby neuronów na efektywność uczenia}
 Dane pozyskane w wyniku eksperymentu pozwoliły na wygenerowanie 2889 wykresów zależności poprawności klasyfikacji w zależności od S1 oraz S2, przy zadanych parametrach współczynnika uczenia.
 Analizując je widzimy dużą skuteczność procesu uczenia dla sieci 2-warstwowych.
@@ -1292,6 +1295,7 @@ Poprawność klasyfikacji przy niektórych ilościach neuronów w poszczególnyc
 Prawdopodobną przyczyną jest duża podatność takiej sieci na parametry początkowe, zwłaszcza dobór wag.
 Mimo inicjalizacji generatora pseudolosowego stałym ziarnem, stan wag może być mniej lub bardziej odległy od optymalnego w zależności od liczby neuronów w poszczególnych warstwach.
 
+\clearpage
 \subsubsection{Wpływ modyfikatorów współczynnika uczenia na poprawność klasyfikacji}
 Poprzez modyfikatory współczynnika uczenia rozumie się parametry lr\_inc oraz lr\_dec, wykorzystywane przy adaptacyjnej aktualizacji współczynnika uczenia.
 Powstałe na ich podstawie wykresy pokazują ponadto poziom efektywności sieci o zadanej liczbie neuronów.
@@ -1354,315 +1358,252 @@ W tym przypadku wpływ wartości parametrów adaptacyjnych jest dużo bardziej w
 \end{figure}
 
 Widzimy że dla osiągnięcia najwyższej skuteczności, istotnym jest ustalenie odpowiedniej wartości obu parametrów.
-Jeśli będziemy modyfikować tylko jeden z nich, a drugi pozostawimy bliski jedności, widzimy brak wymiernych zysków, a nawet pogorszenie dokładności klasyfikacji.
-Ponadto widzimy że niewielkie wartości współczynników nie wpływały w stopniu znacznym na ostateczny wynik testu.
+Jeśli będziemy modyfikować tylko jeden z nich, a drugi pozostawimy bliski jedności, algorytm adaptacyjny wydaje się nie generować zauważalnych zysków.
+Warto zauważyć że zwiększenie wartości lr\_inc przy zachowaniu bliskiej jedności wartości lr\_dec przynosi wręcz odwrotny do zamierzonego efekt - poprawność klasyfikacji drastycznie spada.
+Zachowanie niskich wartości obydwu współczynników również nie powoduje zauważalnych zmian w procesie uczenia.
+Podobne zjawisko widzimy na wykresie \ref{Fig:IncDec6}.
+Wprawdzie ze względu na większą liczbę neuronów, sieć osiągnęła pełną poprawność klasyfikacji również dla bliskich jedności wartości współczynników adaptacyjnych, ale zjawisko jej spadku przy złym doborze tych współczynników również jest zauważalne.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_6.png}
+	\caption{Zależność poprawności klasyfikacji od parametrów adaptacyjnych przy lr~=~0.2, S1~=~11 oraz S2~=~5}
+	\label{Fig:IncDec6}
+\end{figure}
 
 \clearpage
+\subsubsection{Wpływ początkowej wartości współczynnika uczenia na proces uczenia}
+Badanie to przeprowadzono nadmiarowo, celem określenia najlepszego współczynnika uczenia do przeprowadzenia dalszych testów.
+Przykładowy wykres średniej poprawności klasyfikacji dla zadanego współczynnika uczenia w sieci 3-warstwowej prezentują wykresy \ref{Fig:Lr1}
 
-\section{Wstęp/wprowadzenie}
-1 $\div$ 5 stron charakterystyka problematyki w świetle aktualnego stanu wiedzy i~techniki, ze wskazaniem na zagadnienia istotne z punktu widzenia realizowanej pracy.
-Na trzeciej stronie można zamieścić podziękowania dla osób, które przyczyniły się do powstania pracy dyplomowej. Na kolejnej stronie nieparzystej rozpoczyna się spis treści. Po spisie treści zalecane jest umieszczenie wykazu użytych symboli, oznaczeń i akronimów. Od tego miejsca rozpoczyna się numeracja rozdziałów. Na następnej stronie umieszcza się wprowadzenie do pracy (scharakteryzowanie problematyki pracy, uzasadnienie wyboru tematyki) oraz przedstawia: cel i/lub tezę pracy, zakres pracy, przyjęte założenia itp.
-Ostatni akapit wstępu musi zawierać zwięzłe sformułowanie celu i zakresu pracy. 
-\\
-\textcolor{red}{
-Uwaga: \\
-Jeżeli decydujesz się wykorzystywać \LaTeX'a, ignoruj ogólny dokument dotyczący formatowania pracy dyplomowej na WEiI - jest przeznaczony dla użytkowników innych edytorów tekstu. Korzystaj z załączonego arkusza stylu, stosuj formatowanie znaczeniowe (nie wymuszaj formatowania), a wynikowa praca będzie zgodna z wymaganiami. Zachęcamy do używania \LaTeX'a, czas poświęcony na jego przyswojenie, zwróci się z nawiązką nawet w trakcie tworzenia pracy dyplomowej. \\
-Niniejszy tekst, wykorzystujący  styl \texttt{weiiszablon.sty} zawiera informacje o formatowaniu, wielkości czcionek, wyrównania\ldots, ale \textbf{uwaga}, sama treść nie jest istotna (np. opis wielkości czcionek), 
-formatowanie wykona się automatycznie, tu te zapisy są tylko po to, aby dostarczyć dokument zawierający jak najwięcej przykładów użycia \LaTeX'a.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Lr1.png}
+	\includegraphics[width=16cm]{figures/Lr2.png}
+	\caption{Średnia poprawność klasyfikacji przy S1~=~4, S2~=~7 (wykres górny) oraz S1~=~S2~=~6 (wykres dolny)}
+	\label{Fig:Lr1}
+\end{figure}
+Zauważalna jest zależność, gdzie przy sieci uczącej się ogólnie dobrze, początkowa wartość współczynnika uczenia nie wpływała w znacznym stopniu na poprawność klasyfikacji.
+Sieci uczące się gorzej, zwykle najkorzystniej wypadały przy niskim współczynniku uczenia, poniżej wartości 0.4.
+Z tego też powodu w kolejnej serii testów przyjęto wartość współczynnika uczenia równą 0.3.
+
+\clearpage
+\subsection{Seria 3 - Badanie wpływu parametru błędu granicznego na przebieg oraz wynik procesu uczenia}
+W tej serii powtórzono eksperymenty z serii 2, ale przy stałym współczynniku uczenia równym 0.3 i zmiennym współczynnikiem przyrostu błędu adaptacyjnego współczynnika uczenia.
+Wykorzystany w tym celu kod prezentuje listing \ref{lst:test2}
+W ramach serii wykonano 468 468 testów niezależnych sieci, przy różnych parametrach początkowych.
+Podobnie jak w serii drugiej, wagi oraz biasy zainicjowane były stałym ziarnem.
+
+\begin{lstlisting}[language=Rust,caption=Kod wykorzystany do przeprowadzenia 3 serii eksperymentów,label={lst:test2}]
+	fn main() {
+    //Vector for learning data
+    let t_data: Vec<(Array2<f64>, Array2<f64>)>;
+    //Vector for validation data
+    let v_data: Vec<(Array2<f64>, Array2<f64>)>;
+
+    let data = std::fs::read_to_string("zoo.data");
+
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = data::Animal::partitioned_list(animal_list, 0.75);
+    t_data = animal_list
+        .0
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    v_data = animal_list
+        .1
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    //    dbg!(&t_data);
+    let data_len = t_data.len();
+    let test_data = v_data
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
+
+    println!("Learning record count: {}", t_data.len());
+    let lr_step = vec![
+        0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95, 0.96,
+        0.97, 0.98, 0.99, 10.0,
+    ];
+    let lr_inc_step = vec![
+        1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4,
+    ];
+    let lr_dec_step = vec![
+        0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6,
+    ];
+    let er_step = vec![
+        1.0, 1.001, 1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.09, 1.1, 1.15, 1.2, 1.25,
+        1.3, 1.4, 1.5,
+    ];
+
+    let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
+    let (sync_tx, sync_rx) = mpsc::sync_channel(16);
+    let (tx, rx) = mpsc::channel();
+
+    let tmp_threads = threads.clone();
+    thread::spawn(move || {
+        for s1 in 0..t_data.len() / 3 - 7 {
+            for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+                if s2 == 0 && s1 != 0 {
+                    continue;
+                }
+                let x = Network::new(vec![16, s1, s2, 7]);
+                //for lr in &lr_step {
+                for er in &er_step {
+                    let lr = 0.3;
+                    for lr_dec in &lr_dec_step {
+                        for lr_inc in &lr_inc_step {
+                            let mut net = x.clone();
+                            net.name = format!("{},{},{},{},{},{}", s1, s2, lr, lr_dec, lr_inc, er);
+                            let mut t_data = t_data.clone();
+                            let test_data = test_data.clone();
+
+                            let local_lrs = (lr, *lr_dec, *lr_inc);
+                            let local_sync_tx = sync_tx.clone();
+                            let local_tx = tx.clone();
+                            let local_er = *er;
+
+                            local_sync_tx.send(()).unwrap();
+                            let inner_threads = std::sync::Arc::clone(&tmp_threads);
+
+                            *inner_threads.lock().unwrap() += 1;
+                            thread::spawn(move || {
+                                net.sgd(
+                                    &mut t_data,
+                                    1000,
+                                    data_len,
+                                    local_lrs.0,
+                                    Some(&test_data),
+                                    //None
+                                    Some((local_lrs.1, local_lrs.2)),
+                                    0.25 / t_data.len() as f64 / 2.0,
+                                    1000,
+                                    Some(local_er),
+                                );
+                                local_tx.send(()).unwrap();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    loop {
+        let threads = std::sync::Arc::clone(&threads);
+        //println!("{}", threads.lock().unwrap());
+        rx.recv().unwrap();
+        //println!("{}", threads.lock().unwrap());
+        sync_rx.recv().unwrap();
+        *threads.lock().unwrap() -= 1;
+        if *threads.lock().unwrap() <= 0 {
+            break;
+        }
+    }
+
 }
+\end{lstlisting}
+Jednyną zmianą względem serii pierwszej jest utworzenie nowego wektora przechowującego wartości współczynnika przyrostu błędu granicznego oraz zamiana iteratora lr na er.
 
 \clearpage
-
-\section{Tekst zasadniczy -- I}
-
-Do 20\% objętości pracy. W zależności od charakteru pracy ten rozdział powinien zawierać:
-\begin{enumerate}[label=\alph*), leftmargin=1.25cm]
-	\item opis tematyki zagadnienia -- aktualny stan zagadnienia,
-	\item metody i rozwiązania,
-	\item dyskusja i krytyczna ocena stanu aktualnego,
-	\item podsumowanie stanu wiedzy, techniki literaturowe itp.
-\end{enumerate}
-
-\subsection{Formatowanie rozdziałów i podrozdziałów}
-Rozdziały zaczynają się u góry nowej strony (parzystej lub nieparzystej). Podrozdziały i zakresy mogą zaczynać się w dowolnym miejscu strony. Przy końcu pracy zamieszcza się podsumowanie i wnioski. Ostatni akapit podsumowania musi zawierać wyszczególnienie własnej pracy Autora i zaczynać się od sformułowania: „Autor za własny wkład pracy uważa:”. W tym miejscu kończy się numeracja rozdziałów.
-
-Ewentualne listingi programów, instrukcje obsługi stanowisk lub inne tego rodzaju materiały zaleca się zamieścić w formie dodatków. Kolejno zamieszcza się: wykaz literatury, spis rysunków/tabel oraz streszczenie (zgodne ze „Wzorem streszczenia”). Wykaz literatury rozpoczyna od strony nieparzystej.
-
-Opisując własne dokonania, stosuje się formę bezosobową w czasie przeszłym np. celem pracy było zaprojektowanie\ldots, zakres pracy obejmował wyznaczenie\ldots, w~ramach pracy wykonano model\ldots itp.
-\clearpage	
-
-\section{Tekst zasadniczy -- II}
-
-Ponad 50\% objętości pracy -- część autorska:
-\begin{enumerate}[label=\alph*), leftmargin=1.25cm] 
-	\item założenia – dane,
-	\item opis zastosowanej metody rozwiązania lub analizy,
-	\item opis proponowanego rozwiązania, wyniki analizy teoretycznej, obliczenia, projekt konstrukcyjny, procesowy, technologiczny,
-	\item wyniki badań analitycznych, symulacyjnych lub eksperymentalnych itp.
-\end{enumerate}
-
-Przy stosowaniu podziału na rozdziały i podrozdziały zaleca się unikać podziału więcej niż trzystopniowego. Podział tekstu, szczególnie na rozdziały główne, wynikać powinien z zakresu i charakterystyki realizowanej pracy.
-
-\subsection{Formatowanie tekstu. Należy pamiętać, że na końcu tytułu rozdziału, podrozdziału i zakresu nie umieszcza się kropki}
-
-\subsubsection{Marginesy i akapity}
-
-Marginesy deklaruje się jako „lustrzane” i ustawia na 2 cm, na oprawę 1,5 cm. 
-Nagłówek i stopka 1,25 cm. Tekst podstawowy akapitu: czcionka szeryfowa, styl Times (Times New Roman, Liberation Serif itp.), rozmiar 12 punktów, interlinia 1,5 wiersza. Akapit wyjustowany, wcięcie pierwszego wiersza 1,25 cm. 
-
-Na końcu każdego akapitu, którego tekst zaczerpnięto z literatury, musi znajdować się odnośnik do właściwej pozycji w wykazie literatury. W pracy nie stosuje się
-odnośników w formie przypisów. Liczby w nawiasie kwadratowym oznaczają kolejny numer pozycji w wykazie, np. [1] lub [1, 4, 7] lub [1, 6-8] itp.
-
-Cytaty (dosłowne przytoczenie obcego tekstu w pracy) pisze się czcionką pochyłą (kursywą) i ujmuje w cudzysłów. Przykład: „\textit{Współpracując z jednostkami gospodarczymi działającymi w kraju, kształci wysokokwalifikowaną kadrę inżynierów}”.
-
-Fragmenty kodów programów pisze się czcionką o stałej szerokości, styl \footnotesize {\texttt{Courier}}
-\normalsize{(Courier New, Liberation Mono itp.) o rozmiarze 10 punktów.}
-
-
-\subsubsection{Zalecenia co do sposobu pisania jednostek i symboli wielkości fizycznych}
-
-Poniższy podrozdział opracowano na podstawie \cite{Pawluk2001}. W trakcie pisania pracy należy zwracać uwagę na sposób oznaczania jednostek i symboli wielkości fizycznych. Przy zapisywaniu jednostek i symboli wielkości fizycznych można wyróżnić zapis w~postaci kursywy (pismo pochyłe) oraz antykwy (pismo proste). 
-
-\begin{enumerate}[label=\arabic*), leftmargin=1.25cm]
-\item Kursywę należy stosować w następujących przypadkach:
-
-\begin{itemize}[label=-,labelsep=0.4cm,leftmargin=0.6cm] %[leftmargin=0.65cm]
-\item symboli wielkości fizycznych niezależnie od tego czy jest to litera alfabetu greckiego (np. przenikalność magnetyczna $\mu$) czy też łacińskiego (np. rezystancja $R$). Należy przestrzegać tej zasady niezależnie od miejsca, w którym pojawia się symbol tj. tekst, wzory matematyczne, rysunki, tabele,
-
-\item ogólny symbol zapisu funkcji czyli np. $f$, a nie f. Nie dotyczy to jednak zapisu konkretnych funkcji np. $\cos \omega t$ a nie $cos \omega t$,
-
-\item macierze, wektory, których elementami są wielkości fizyczne należy zapisywać dodatkowo czcionką półgrubą (bold) np. 
-$\bm{R} = \left[ 
-\begin{array}{cc}
-R_{11} & R_{12} \\
-R_{21} & R_{22} 
-\end{array} 
-\right]$,
-$\bm{U} = \left[ 
-\begin{array}{c}
-U_{1} \\
-U_{2} 
-\end{array} 
-\right]$,
-
-\item wskaźnik dolny, górny, prawo- i lewostronny, ale tylko gdy odnosi się do konkretnej wielkości fizycznej, czyli np. składowa $x$-owa indukcji magnetycznej $B_x$, a nie $B_{\mathrm{x}}$,
-
-\item wskaźniki górne i dolne oznaczające dowolną liczbę np. $R_j$, $I^k$, ale nie $R_\mathit{1}$, $I^\mathit{2}$.
-
-\end{itemize}
-
-\item Antykwę należy stosować w następujących sytuacjach:
-
-\begin{itemize}[label=-,labelsep=0.4cm,leftmargin=0.6cm]
-\item wszystkie cyfry,
-
-\item symbole konkretnych funkcji np. $\mathrm{tg\ } \omega t$, a nie $tg \omega t$,
-
-\item operatory operacji matematycznych np. pochodne zwyczajne $\frac{\mathrm{d} x}{\mathrm{d} t}$, a nie $\frac{d x}{d t}$,
-
-\item symbole liczb o konkretnej wartości np. przenikalność elektryczna próżni $\varepsilon_0 = 8,8542 \cdot 10^{-12}$ $\mathrm{F} \cdot \mathrm{m}^{-1}$, a nie $\varepsilon_0 = 8,8542 \cdot 10^{-12}$ $\mathrm{F} \cdot \mathrm{m}^{-1}$,
-
-\item indeksy, jeżeli odnoszą się do: obiektów (fizycznych, geometrycznych), czyli, np. natężenie pola elektrycznego w punkcie A to $E_\mathrm{A}$, a nie $E_A$, zjawisk lub stanów fizycznych, np. moment obciążenia to $T_\mathrm{L}$, a nie $T_L$, do nazwisk czy też oznaczeń pierwiastków, np. straty w miedzi to $P_{\mathrm{Cu}}$ a nie $P_{Cu}$, do charakteru wielkości symbolizowanej przez literę źródłową, np. wartość maksymalna siły to $F_\mathrm{max}$, a nie $F_{max}$, oznaczeń jednostek miary np. $\mathrm{M}\Omega$, a nie $M \mathit{\Omega}$.
-
-\end{itemize}
-
-\item W przypadku jednostek miar (które zawsze należy pisać antykwą) zapisując konkretną wartość liczbą należy podać jej wartość i jednostkę z zachowaniem następujących zasad:
-
-\begin{itemize}[label=-,labelsep=0.4cm,leftmargin=0.6cm]
-\item zapisując wartość liczbową wielkości fizycznej po spacji należy podać jej jednostkę, ale nie nazwę jednostki np. $10 \mathrm{A}$, ale nie $10$ amper czy też $10$ amperów,
-
-\item zapisując wartość liczbową słownie należy w tej konwencji podać też jednostkę np. dziesięć omów, ale nie dziesięć $\Omega$
-
-\item do oznaczeń jednostek nie wolno dopisywać indeksów, np. moc wyjściowa silnika wynosi $P=100$ $\mathrm{kW}_\mathrm{out}$. W takim przypadku należy zapisać $P_\mathrm{out}=100$ $\mathrm{kW}$,
-
-\item jednostek nie należy umieszczać w nawiasach kwadratowych, np. $I=1$ $\mathrm{[A]}$. Odstępstwem od tej zasady mogą być tabele, nagłówki kolumn, opisy osi na wykresach oraz w sporadycznych sytuacjach we wzorach matematycznych (ale tylko wówczas, gdy zależność matematyczna nie wskazuje w~jakiej jednostce wystąpi wartość liczbowa). Przykłady odstępstw zamieszczono w~podrozdziale \ref{Subsec:Rysunki-i-tabele}.   
-
-\end{itemize}
-
-\item W trakcie zapisu symboli wielkości matematycznych można stosować również szereg znaków diakrytycznych, jak również należy przestrzegać następujących zaleceń:
-
-\begin{itemize}[label=-,labelsep=0.4cm,leftmargin=0.6cm]
-\item wartości chwilowe podstawowych wielkości fizycznych używanych np. w elektrotechnice należy zapisać małymi literami, np. $u$, $i$, lub stosować zapis np. $u(t)$, lub stosować indeks ,,$t$'' przy wielkości, np. $U_t$,
-
-\item wartości skuteczne wielkości okresowych należy zapisać dużą literą np. $U$, $I$, 
-
-\item wartości szczytowe funkcji zmiennej, amplitudę funkcji sinusoidalnej czasu należy zapisać jako np. $U_\mathrm{m}$,
-
-\item podkreślenie symboli reprezentujących wielkości fizyczne, których wartość liczbowa jest liczbą zespoloną, przy czym podkreślenie dotyczy tylko literki źródłowej np. $\underline{Z}_1$, a nie $\underline{Z_1}$,
-
-\item kreska nad literą źródłową oznacza wartość średnią, np. $\overline{I}$ co jest równoważne $I_\mathrm{av}$.
-
-\end{itemize}
-
-\end{enumerate}
-
-
-
-
-\subsubsection{Rysunki i tabele} \label{Subsec:Rysunki-i-tabele}
-Tekst podstawowy w tabeli pisze się czcionką o rozmiarze 10 punktów, pojedyncza interlinia. Dane liczbowe – wyśrodkowane, dane tekstowe – wyrównane do lewej. Rysunki i tabele zamieszcza się wyśrodkowane na stronie, bez wcięcia pierwszego wiersza.
-
-W akapicie poprzedzającym rysunek lub tabelę musi znajdować się krótki opis, czego dotyczy dany rysunek/tabela (odniesienie do rysunku/tabeli). Tytuły numeruje się zgodnie z kolejnością w danym rozdziale: numer\_rozdziału.numer\_tabeli/rysunku (np. rys. 2.1, tabela 3.5). W tytule rysunku/tabeli, zaczerpniętych z literatury, podaje się odnośnik do właściwej pozycji. Należy zadbać o to, aby opisy na rysunkach były czytelne (czcionka 8 punktów lub większa). Staraj się nie wymuszać numeracji, pozwól aby robił to za ciebie \LaTeX. Stosuj \verb!\label! do znakowania obiektów, do których być może w tekście się będziesz odwoływał (rozdziały, rysunki, tabele, wzory, listingi \ldots). Odwołuj się do nich w tekście  za pomocą funkcji \verb!\ref{NazwaObiektu}!. Pamiętaj, że \LaTeX\, korzystając z polecenia \verb|latex| nie odczytuje z plików .jpg, .png ich wielkości. Polecenie \verb|latex| generuje plik \verb|DVI|. Jeżeli chcesz go używać zgłosi stosowny błąd. Aby się go pozbyć zdefiniuj wielkość natywną pliku grafiki. Polecamy jednak używanie zamiast polecenia \verb|latex|, polecenie \verb|pdflatex|, wówczas problem nie wystąpi.\\
-
-\begin{example}
-[\ldots] co umożliwia wyznaczenie wartości napięcia. Na rys. \ref{Fig:schemat} przedstawiono schemat obwodu z równolegle dołączoną pojemnością $C_p$.
-\end{example}
+\subsubsection{Wpływ zmiennego współczynnika granicznego na poprawność klasyfikacji przy zmiennej liczbie neuronów}
+Na bazie uzyskanych w ramach eksperymentów danych, możliwe było ponowne utworzenie wykresów zależności poprawności  klasyfikacji w zależności od liczby neuronów w poszczególnych warstwach sieci.
+W przypadku większości wykresów widoczna była wyraźna zależność pomiędzy wartością badanego współczynnika, a ogólną efektywnością sieci.
+Dla jego niskich wartości, zbliżonych do jedności, sieć cechowała się silnie niekorzystną charakterystyką, pokazaną na wykresie \ref{Fig:ErS1S21}
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=6cm]{figures/fig1.png}
-	\caption{Tytuł rysunku, rozmiar 11 pkt., pojedyncza interlinia, akapit wyśrodkowany, bez wcięcia pierwszego wiersza. Na końcu tytułu rysunku/tabeli nie stawia się kropki [8]}
-\label{Fig:schemat}
+	\includegraphics[width=16cm]{figures/ErS1S2_1.png}
+	\caption{Poprawność klasyfikacji przy er~=~1, lr\_dec~=~0.8 oraz lr\_inc~=~1.25}
+	\label{Fig:ErS1S21}
+\end{figure}
+Z wykresu wynika, że pomimo teoretycznie bardzo korzystnych wartości współczynników adaptacyjności, niska wartość współczynika błędu granicznego wyraźnie zredukowała zdolność sieci do przeprowadzenia poprawnej klasyfikacji.
+Zależność tą dodatkowo popiera kolejny wykres \ref{Fig:ErS1S22} który pokazuje że już niewielkie zwiększenie współczynnika er, znacznie poprawia efektywność uczenia algorytmem adaptacyjnym.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/ErS1S2_2.png}
+	\caption{Poprawność klasyfikacji przy er~=~1.01, lr\_dec~=~0.8 oraz lr\_inc~=~1.25}
+	\label{Fig:ErS1S22}
 \end{figure}
 
-\begin{example}
-[\ldots] Na rysunku \ref{Fig:wykres} pokazano przykładową zależność prądów pasmowych $i_\mathrm{ph}$ bezszczotkowego silnika prądu stałego z magnesami trwałymi w funkcji położenia wirnika $\theta$.
-\end{example}
+Istotnym zaznaczenia jest jednakże fakt, że istnieje ryzyko przeszacowania współczynnika er również  w przeciwnym kierunku.
+W zależności od pozostałych parametrów adaptacyjnych, jego zwiększanie ponad pewien poziom także spowoduje spadek poprawności klasyfikacji, co prezentuje wykres \ref{Fig:ErS1S23}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/ErS1S2_3.png}
+	\caption{Poprawność klasyfikacji przy er~=~1.15, lr\_dec~=~0.8 oraz lr\_inc~=~1.25}
+	\label{Fig:ErS1S23}
+\end{figure}
+
+Trend ten utrzymuje się praktycznie dla wszystkich kombinacji współczynników adaptacyjnych, przy czym zarówno dolna jak i górna granica obszaru efektywnego uczenia nie jest między nimi stała.
+Możemy się spodziewać lepszego zobrazowania tego zjawiska w kolejnym zestawieniu.
+
+\clearpage
+\subsubsection{Ogólny wpływ parametrów adaptacyjnych na efektywność uczenia sieci}
+Poniższe zestawienie pozwala lepiej zaobserwować wpływ parametru er na efektywność uczenia, gdyż przy sieciach o stałej liczbie neuronów, stworzona implementacja gwarantuje w pełni powtarzalne warunki początkowe.
+Już wstępna analiza pozyskanych danych pozwala stwierdzić konieczność zastosowania wartości er większej od jedności.
+Typowe zachowanie sieci dla przypadku nie spełniającego tego warunku prezentuje wykres \ref{Fig:ErIncDec1}.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=12cm]{figures/fig2.png}
-	\caption{Tytuł rysunku, rozmiar 11 pkt., pojedyncza interlinia, akapit wyśrodkowany, bez wcięcia pierwszego wiersza. Na końcu tytułu rysunku/tabeli nie stawia się kropki [8]}
-\label{Fig:wykres}
+	\includegraphics[width=16cm]{figures/ErIncDec_1.png}
+	\caption{Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1, S1~=~3 oraz S2~=~10}
+	\label{Fig:ErIncDec1}
 \end{figure}
 
-
-\begin{example}
-[\ldots] oraz indukcyjności wzajemnej. W tabeli \ref{Tab:tabela} przedstawiono podstawowe parametry obwodu nieliniowego, zasilanego napięciem trójfazowym.
-\end{example}
-
-\begin{table}[ht]
-\caption{Tytuł tabeli, rozmiar 11 pkt., pojedyncza interlinia, akapit wyrównany do lewej}
-\centering		
-	\begin{tabular}{|c|c|c|c|c|}	
-		\hline
-		$U$ [V] & $I$ [mA] & $R$, [k$\Omega$] & $L$ [mH] & $R/R_{20}$ \\
-		\hline
-		13,6 & 7,29 & 3,94 & 100 & 1,25 \\
-		\hline
-	\end{tabular}	
-	
-\label{Tab:tabela}
-\end{table}	
-
-{\subsubsection{Wzory matematyczne}}
-
-Zmienne we wzorach pisze się czcionką pochyłą (styl edytora równań „Matematyka”) natomiast symbole, nie będące zmiennymi, czcionką prostą (styl „Tekst”).
-Rozmiary czcionek: normalny 12 punktów, indeks dolny/górny 9 pkt., indeks podrzędny 7 pkt., symbol 24 pkt., podsymbol 12 pkt. Separatorem dziesiętnym w liczbach jest
-przecinek, a nie kropka (dotyczy to również liczb pisanych w tekście akapitu). Poddaj się w tym zakresie \LaTeX'owi - pisz wzór, a poprawnie się utworzy.
+Co istotne, poprawność klasyfikacji rzędu 4\% jest stanem charakterystycznym dla sieci która nigdy nie podjęła nauki, a jedynie została zainicjalizowana wartościami losowymi.
+Może to sugerować błąd warunku brzegowego w wykonanej implementacji algorytmu adaptacyjnego.
+Z tej też przyczyny, wyniki dla współczynnika błędu granicznego równego 1 możemy uznać za przypadek odrębny od pozostałych.
 
 
-Pod wzorem należy zamieścić objaśnienia użytych symboli (chyba, że znajdują się w wykazie na początku pracy). Wzory umieszcza się wyśrodkowane i numeruje zgodnie
-z kolejnością w danym rozdziale: (numer\_rozdziału.numer\_wzoru). Numery wzorów wyrównuje się do prawego marginesu. W akapicie poprzedzającym wzór musi znajdować się krótki opis, czego dotyczy dany wzór i – jeżeli potrzeba – odwołanie do literatury.
-
-\begin{example}
-[\ldots] wyznacza się, na podstawie wyrażenia (\ref{Eq:rownanie}). W nawiasach podano rozmiary czcionek używanych we wzorach
-\end{example}
-
-\begin{equation}
-A(12)={\sum}(24)m_{s(9)}N^{k_{p(7)}}
-\label{Eq:rownanie}
-\end{equation}
-gdzie: $m_s$ -- masa próbki, $N$ -- natężenie oświetlenia, $k_p$ -- wykładnik potęgi $(k_p=1,3-2,1)$.\\
-\newpage
-{\subsubsection{Listingi programów}}
-
-W pracy dyplomowej możesz umieszczać fragmenty programów. Pamiętaj, aby umieszczać krótkie, tylko najważniejsze fragmenty kodów źródłowych. Zawsze je komentuj w treści
-pracy dyplomowej. Typowo w \LaTeX\ kody źródłowe umieszczane są w środowisku verbatim (\verb|\begin{verbatim}...\end{verbatim}|). Obecnie instnieje jednak bardziej nowoczesne i bardziej funkcjonalne środowisko \verb|lstlisting| (wymaga zainstalowanego w systemie pakietu \verb|listings|). Zwróć uwagę, że możesz kolorować składnię
-automatycznie za pomocą parametru \verb|language|. W niniejszym dokumencie przedstawiono dwa przykłady listingów, Listing \ref{KodMatlab1} to przykład kodu źródłowego Matlaba, a poniżej Listing \ref{KodPerl1} dla Perl'a.\\
-%\komentarz{
-
-\begin{lstlisting}[language=Matlab,caption=Listing programu Matlab,label={KodMatlab1}]
-i = 1
-p = 3
-for i = 1:10
-    if i > 3
-        i=i+p
-    else 
-        i=i+1
-    end
-end
-\end{lstlisting}
-
-\begin{lstlisting}[language=Perl,caption=Listing programu Perl,label={KodPerl1}]
-  my $url ='http://pei.prz.edu.pl';
-  use LWP::Simple;
-  my $content = get $url;
-  die "Couldn't get $url" unless defined $content;
-  print $content;
-  print "\n";
-  print "Length " + length($content)
-\end{lstlisting}
-
-Z pewnością przeglądając źródło tego dokumentu zobaczysz, że kody źródłowe powinny mieć zdefiniowane parametry \verb|label|, aby łatwo w tekście do nich się odwoływać.
-Numeracja linii jest w stylu domyślnie włączona (to przydatne, bo w treści pracy łatwo odwołać się dzięki temu do konkretnego wiersza w kodzie źródłowym), możesz je wyłączyć podając jako parametr \verb|numbers=none|. Więcej szczegółów możesz odnaleźć w sekcji \verb|\lstset| pliku arkusza styli. 
-%}
+Przechodząc do wyników nie należących do przypadku skrajnego, możemy zaobserwować wyraźny wpływ wartości współczynnika błędu granicznego na efektywność uczenia sieci.
+Pierwszym przykładem reprezentatywnym jest wykres \ref{Fig:ErIncDec2}.
+Pokazuje on przykładową sieć 3-warstwową zdolną do osiągania pełnej poprawności klasyfikacji, ale jednocześnie silnie uzależnioną od doboru metaparametrów.
 
 
-\subsubsection{Numerowanie i punktowanie}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/ErIncDec_2.png}
+	\caption{Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1.01, S1~=~3 oraz S2~=~10}
+	\label{Fig:ErIncDec2}
+\end{figure}
 
-\begin{enumerate}[label=\arabic*), leftmargin=1.25cm]
-	\item Pierwszy poziom (stosuje się numerowanie lub punktowanie). Formatowanie:
-	akapit wyjustowany, wcięcie od lewej 0,75 cm, wysunięcie co 0,5 cm.
-	\item Znakiem numerowania jest liczba (z kropką lub nawiasem).
-		\begin{itemize}[label=-,labelsep=0.4cm,leftmargin=0.6cm]
-			\item drugi poziom (stosuje się wyłącznie punktowanie). Formatowanie: akapit
-			wyjustowany, wcięcie od lewej 1,25 cm, wysunięcie co 0,5 cm,
-			\item znakiem punktowania jest łącznik lub mała litera alfabetu (z nawiasem). Nie
-			zaleca się stosowania kropek, strzałek itp.,
-			\item punktowane akapity rozpoczyna się minuskułą (małą literą), na końcu akapitu
-			stawia się przecinek, ostatni punktowany akapit kończy się kropką.
-		\end{itemize}
-	\item Numerowane akapity rozpoczyna się majuskułą (wielką literą) i kończy kropką.
-	\item Należy zwrócić uwagę, aby nie rozdzielać numerowania/punktowania pomiędzy
-	kolejnymi stronami tekstu.
-\end{enumerate}
+Uwagę warto zwrócić na  występujące również w poprzedniej serii eksperymetnów odchylenia od poziomu średniego dla wartości lr\_dec bliskiej jedności oraz ,,schodkowy'' charakter pozostałej części wykresu.
+Wykres \ref{Fig:ErIncDec3} pokazuje wyraźną poprawę zarówno w obszarze dotychczasowo niskiej poprawności, jak i w obszarze najbardziej zbliżonym do pożądanego.
+Co więcej, wartości z zakresu 1.04-1.05 wydają się najpotymalniej sprawdzać w większości przypadków sieci, co wyjaśnia zastosowanie ich jako stałych między innymi w środowisku MATLAB.
 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/ErIncDec_3.png}
+	\caption{Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1.04, S1~=~3 oraz S2~=~10}
+	\label{Fig:ErIncDec3}
+\end{figure}
 
-\subsection{Wykaz literatury}
+W przypadku tej konfiguracji sieci dalsze zwiększanie wartości er nie powoduje silnego spadku poprawności klasyfikacji.
+Co więcej, dla jego wysokich wartości dochodzi do zaniku ,,schodkowego'' charakteru rozkładu poprawności klasyfikacji, co prezentuje wykres \ref{Fig:ErIncDec4}.
+Należy jednak zwrócić uwagę, że pomimo ogólnej poprawy działania sieci o zadanej liczbie neuronów, zanika część przypadków w których sieć osiągała pełną poprawność.
 
-W wykazie literatury zamieszcza się wyłącznie pozycje, na które powołano się
-w pracy. Kolejność numerów w wykazie – zgodna z kolejnością pojawiania się danej
-pozycji w tekście.
-
-Format akapitu: akapit wyjustowany, wysunięcie 0,75 cm. Prawidłowo opracowany
-wykaz został zaprezentowany w niniejszym dokumencie w odpowiednim rozdziale, oznaczonym jako „Literatura”  (pozycja nr \cite{str} to zasoby internetowe,
-\cite{Jakubczyk1997} – książka, \cite{Barski2011} – artykuł w czasopiśmie, \cite{dokum} – karta katalogowa).
-
-{\subsection{Wydruk pracy}}
-
-Przed wydrukiem należy usunąć ewentualne błędy literowe i sprawdzić prawidłową
-interpunkcję. Przykładowo, łącznik zapisuje się za pomocą krótkiego minusa (np.
-badawczo-rozwojowy) natomiast myślnik -- stosowany w zdaniach wtrąconych -- zapisuje
-się za pomocą długiej pauzy. Dzielenie wyrazów według uznania Autora (można podzielić
-długie wyrazy, powodujące duże „rozstrzelenie” tekstu w poprzedzającym wierszu. Zaleca się usunięcie pojedynczych znaków na końcu wiersza oraz podwójnych spacji w tekście.
-Dla przedrostka „mikro” należy unikać stosowania litery „u” zamiast „$\mu$”. Znak „$\mu$” można
-otrzymać przytrzymując lewy Alt i wpisując na klawiaturze numerycznej 0181 (podobnie
-„stopień”: Alt-0176). W celu uniknięcia „rozstrzelenia” liczb i ich jednostek zaleca się
-używanie „twardej” spacji pomiędzy liczbą i jednostką. Należy sprawdzić, czy tytuły
-podrozdziałów/zakresów nie zostały jako pojedyncze wiersze na poprzedniej stronie oraz
-czy rysunki/tabele i ich tytuły nie zostały rozdzielone pomiędzy kolejnymi stronami.
-
-Pracę drukuje się dwustronnie. Zaleca się wydruk w kolorze. Przed wydrukiem
-należy ponumerować strony (czcionka 10 pkt., dół strony, akapit wyśrodkowany). Strony
-tytułowej oraz strony z podziękowaniem nie numeruje się. Spis treści rozpoczyna się od
-strony numer 3 (lub 5, jeżeli zamieszczono podziękowania).
-
-\clearpage
-
-\section{Podsumowanie i wnioski końcowe}
-
-1 $\div$ 3 stron merytorycznie podsumowanie najważniejszych elementów pracy oraz wnioski wynikające z osiągniętego celu pracy. Proponowane zalecenia i modyfikacje oraz rozwiązania będące wynikiem realizowanej pracy.
-
-Ostatni akapit podsumowania musi zawierać wykaz własnej pracy dyplomanta i zaczynać się od sformułowania: „Autor za własny wkład pracy uważa: \ldots”.
-
-\clearpage
-
-\section*{Załączniki}
-\addcontentsline{toc}{section}{Załączniki}
-
-Według potrzeb zawarte i uporządkowane uzupełnienie pracy o dowolny materiał źródłowy (wydruk programu komputerowego, dokumentacja kons\-truk\-cyj\-no-\-tech\-no\-lo\-gicz\-na, konstrukcja modelu -- makiety -- urządzenia, instrukcja obsługi urządzenia lub stanowiska laboratoryjnego, zestawienie wyników pomiarów i obliczeń, informacyjne materiały katalogowe itp.).
-
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/ErIncDec_4.png}
+	\caption{Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1.5, S1~=~3 oraz S2~=~10}
+	\label{Fig:ErIncDec4}
+\end{figure}
 
 \clearpage
 
@@ -1678,6 +1619,5 @@ Według potrzeb zawarte i uporządkowane uzupełnienie pracy o dowolny materiał
 
 \clearpage
 
-\makesummary
 
 \end{document} 
