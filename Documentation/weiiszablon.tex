@@ -167,11 +167,11 @@ Siecią neuronową jednowarstwową nazywamy taką sieć, w której neurony nie s
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=12cm]{figures/models/singleLayerModel.png}
-	\caption{Model prostej sieci jednowarstwowej - Placeholder}
+	\caption{Model prostej sieci jednowarstwowej}
 	\label{Fig:singleNetwork}
 \end{figure}
 
-Wejściem każdego neuronu jest wektor sygnałów wejściowych $x$, zaś wyjściem sieci wektor $y = \left[ y_1, y_2, y_3, \cdots, y_L \right]^T$.
+Wejściem każdego neuronu jest wektor sygnałów wejściowych $x$, zaś wyjściem sieci wektor $y = \left[ a_1, a_2, a_3, \cdots, a_K \right]^T$.
 Ponadto możemy zdefiniować również wektor przesunięć $b = \left[ b_1, b_2, \cdots, b_K \right]$
 Liczba wyjść z sieci jest tożsama z liczbą neuronów.
 
@@ -188,26 +188,26 @@ $$\bm{w} = \left[
 Przy założeniu że każdy neuron realizuje tą samą funkcję aktywacji, działanie sieci jednowartwowej wielowarstwowej możemy wyrazić w postaci macierzowej:
 \begin{equation}
 	\label{eq:singleLayerOut}
-	y = f\left( wx + b \right)
+	a = f\left( wx + b \right)
 \end{equation}
 \subsection{Sieć neuronowa wielowarstwowa}
 Siecią neuronową wielowarstwową, nazywamy taką sieć w której neurony ułożone są w dwóch lub więcej połączonych ze sobą warstwach.
 Możemy zatem powiedzieć że jest to pewna liczba połączonych kaskadowo sieci jednowarstowych, a wyjście pojedynczej warstwy jest równocześnie wejściem warstwy następnej.
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=12cm]{figures/models/manyLayerPlaceholder.png}
-	\caption{Model prostej sieci trójwarstwowej - Placeholder}
+	\includegraphics[width=14cm]{figures/models/manyLayerModel.png}
+	\caption{Model prostej sieci trójwarstwowej}
 	\label{Fig:multiNetwork}
 \end{figure}
 
 W przypadku tego typu sieci ilość macierzy wag jest równa liczbie warstw neuronów.
-Oznaczając $y^{(l)}$ jako wyjście, $w^{(l)}$ jako macierz wag, $b^{(l)}$ jako macierz biasów, a $f^{(l)}$ jako funkcję aktywacji neuronów $l-$tej warstwy oraz wykorzystując równanie \ref{eq:singleLayerOut}, w przypadku sieci trójwarstwowej otrzymamy równania:
+Oznaczając $a^{(l)}$ jako wyjście, $w^{(l)}$ jako macierz wag, $b^{(l)}$ jako macierz biasów, a $f^{(l)}$ jako funkcję aktywacji neuronów $l-$tej warstwy oraz wykorzystując równanie \ref{eq:singleLayerOut}, w przypadku sieci trójwarstwowej otrzymamy równania:
 \begin{equation}
 	\label{eq:tripleLayerOut}
 	\begin{aligned}
-		y^{(1)} &= f^{(1)} \left( w^{(1)} x + b^{(1)} \right)\\
-		y^{(2)} &= f^{(2)} \left( w^{(2)} y^{(1)} + b^{(2)} \right)\\
-		y^{(3)} &= f^{(3)} \left( w^{(3)} y^{(2)} + b^{(3)} \right)
+		a^{(1)} &= f^{(1)} \left( w^{(1)} x + b^{(1)} \right)\\
+		a^{(2)} &= f^{(2)} \left( w^{(2)} a^{(1)} + b^{(2)} \right)\\
+		a^{(3)} &= f^{(3)} \left( w^{(3)} a^{(2)} + b^{(3)} \right)
 	\end{aligned}
 \end{equation}
 
@@ -215,7 +215,7 @@ Następnie, wykorzystując równania \ref{eq:tripleLayerOut}, możemy opisać dz
 
 \begin{equation}
 	\label{eq:tripleLayerCombined}
-	y^{(3)} &= f^{(3)} \left( w^{(3)} f^{(2)} \left( w^{(2)} f^{(1)} \left( w^{(1)} x + b^{(1)} \right) + b^{(2)} \right) + b^{(3)} \right)
+	a^{(3)} &= f^{(3)} \left( w^{(3)} f^{(2)} \left( w^{(2)} f^{(1)} \left( w^{(1)} x + b^{(1)} \right) + b^{(2)} \right) + b^{(3)} \right)
 \end{equation}
 
 \subsection{Proces uczenia sieci z wykorzystaniem metody gradientowej}
@@ -227,7 +227,7 @@ Przykładem takiej funkcji, jest funkcja błędu średniokwadratowego (MSE):
 	C\left( w, b, x, a\right) = \frac{1}{2n} \sum\limits_{x} || y\left( x \right) - a ||^2
 \end{equation}
 
-W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$ wszystkich jej biasów, $x$ zbiór danych wejściowych, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór oczekiwanych wyjść z sieci.
+W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$ wszystkich jej biasów, $x$ zbiór danych wejściowych, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór uzyskanych wyjść z sieci.
 Zakładając, że w procesie uczenia wartości $x$ oraz $a$ pozostają stałe, możemy uprościć oznaczenie funkcji do postaci $C (w,b)$.
 Funkcja ta dąży do 0 gdy wartości otrzymywane na wyjściu sieci są bliskie wartościom oczekiwanym, i rośnie wraz ze wzrostem różnicy pomiędzy nimi.
 W związku z powyższym, należy znaleźć taką metodę, która pozwoli na minimalizację wartości funkcji $C(w,b)$.
@@ -1106,7 +1106,7 @@ W tym celu wykorzystano mechanizm wątków oraz system komunikacji kolejkowej ,,
                                     local_lrs.0,
                                     Some(&test_data),
                                     Some((local_lrs.1, local_lrs.2)),
-                                    0.25 / t_data.len(),
+                                    0.25 / t_data.len() as f64 / 7.0,
                                     1000,
                                     Some(local_er),
                                 );
@@ -1146,7 +1146,7 @@ Prawodpodobnie z powodu przyjęcia funkcji sigmoidalnej dla neuronów warstwy wy
 Przy $n$ oznaczającym długość zbioru uczącego, powodowało występowanie dużej liczby błędów podczas walidacji działania sieci, nawet na zbiorze uczącym.
 Dalsze testy wykazały zwiększenie efektywności wskazań sieci przy kilkukrotnym zmniejszeniu wartości błędu docelowego.
 Wynik 100\% poprawnej klasyfikacji był osiągany regularnie, dla różnych warunków startowych, przy wartości $\text{err\_goal} = \frac{0.25}{2n}$
-Z tego powodu, w części kolejnych eksperymentów również przyjmowano niższe wartości błędu docelowego.
+Z tego powodu, w części kolejnych eksperymentów również przyjmowano niższe wartości błędu docelowego, .
 
 
 \begin{lstlisting}[language=Rust,caption=Skrypt uczący dla bramki logicznej XOR,label={lst:example_xor}]
@@ -1244,7 +1244,7 @@ Modyfikację przykładowego kodu wykorzystaną do ich przeprowadzenia prezentuje
                                     local_lrs.0,
                                     Some(&test_data),
                                     Some((local_lrs.1, local_lrs.2)),
-                                    0.25 / t_data.len() as f64 / 2.0,
+                                    0.25 / t_data.len() as f64 / 7.0,
                                     1000,
                                     None
                                 );
@@ -1491,7 +1491,7 @@ Podobnie jak w serii drugiej, wagi oraz biasy zainicjowane były stałym ziarnem
                                     Some(&test_data),
                                     //None
                                     Some((local_lrs.1, local_lrs.2)),
-                                    0.25 / t_data.len() as f64 / 2.0,
+                                    0.25 / t_data.len() as f64 / 7.0,
                                     1000,
                                     Some(local_er),
                                 );
@@ -1596,7 +1596,9 @@ Co więcej, wartości z zakresu 1.04-1.05 wydają się najpotymalniej sprawdzać
 
 W przypadku tej konfiguracji sieci dalsze zwiększanie wartości er nie powoduje silnego spadku poprawności klasyfikacji.
 Co więcej, dla jego wysokich wartości dochodzi do zaniku ,,schodkowego'' charakteru rozkładu poprawności klasyfikacji, co prezentuje wykres \ref{Fig:ErIncDec4}.
-Należy jednak zwrócić uwagę, że pomimo ogólnej poprawy działania sieci o zadanej liczbie neuronów, zanika część przypadków w których sieć osiągała pełną poprawność.
+Należy jednak zwrócić uwagę, że pomimo ogólnej poprawy działania sieci o zadanej liczbie neuronów, zanika jej zdolność do osiągania pełnej poprawności.
+Widoczne są jednak pojedyncze sukcesy w jej osiągnięciu, a sama sieć wydaje się posiadać względnie dobrą zdolność uogólniającą.
+Możliwe że zwiększenie liczby epok, wpłynęłoby pozytywnie na wyniki procesu uczenia.
 
 \begin{figure}[ht]
 	\centering
@@ -1605,7 +1607,210 @@ Należy jednak zwrócić uwagę, że pomimo ogólnej poprawy działania sieci o 
 	\label{Fig:ErIncDec4}
 \end{figure}
 
+
 \clearpage
+\subsubsection{Uogólniony wpływ współczynnika błędu granicznego na poprawność klasyfikacji}
+Na podstawie przeprowadzonych eksperymentów, podobnie jak w serii drugiej, możliwa była również obserwacja wpływu parametru er na średnią efektywność uczenia każdej z testowanych sieci.
+W przypadku sieci 2 warstwowej zauważalny był ogólny stały trend zaprezentowany na wykresie \ref{Fig:Er1}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Er_1.png}
+	\caption{Średnia poprawność klasyfikacji sieci 2-warstwowej przy 13 neuronach w warstwie pierwszej}
+	\label{Fig:Er1}
+\end{figure}
+
+Sieci 2-warstwowe utrzymywały ogólnie dobrą poprawność klasyfikacji niezależnie od wartości współczynnika er.
+Co więcej, również przy obecnie przyjętej reprezentacji wyników widoczny jest drastyczny spadek poprawności klasyfikacji dla współczynnika równego jedności.
+Jest to kolejna przesłanka świadcząca o możliwym błędzie implementacji dla tego warunku brzegowego.
+
+W przypadku sieci 3-warstwowych występują 2 ogólne trendy.
+Pierwszy podobny do trendu dla sieci 2-warstwowych prezentuje wykres \ref{Fig:Er2}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Er_2.png}
+	\caption{Średnia poprawność klasyfikacji sieci 3-warstwowej przy S1~=~5 oraz S2~=~10}
+	\label{Fig:Er2}
+\end{figure}
+
+Jest to zachowanie typowe dla sieci o względnie dużej liczbie neuronów w dwóch pierwszych warstwach.
+Wskazuje to na ogólnie dobrą efektywność takich sieci, i idący za tym szeroki zakres korzystnych wartości współczynnika er.
+Reguła ta nie jest jednak stała, i objawia się przede wszystkim w sieciach o mniejszej liczbie neuronów a także w sieciach w których występuje wysoka dysproporcja liczby neuronów między wartstwą pierwszą oraz drugą.
+Przykład alternatywnego trendu widzimy na wykresie \ref{Fig:Er3}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Er_3.png}
+	\caption{Średnia poprawność klasyfikacji sieci 3-warstwowej przy S1~=~11 oraz S2~=~3}
+	\label{Fig:Er3}
+\end{figure}
+
+Sieci takie cechowały się przede wszystkim ogólnie gorszą średnią poprawnością klasyfikacji, rzadko osiągającą ponad 85\%.
+W ich przypadku, najlepszą efektywność uzyskiwano przy niskich wartościach współczynnika błędu granicznego.
+Podobnie jak wnioskowano na podstawie wykresów zależności poprawności klasyfikacji od współczynników adaptacyjnych,
+również w tym przypadku widzimy że najlepszą efektywność w przypadku takich sieci uzyskuje się dla wartości er bliskich 1.05.
+
+\clearpage
+
+\subsubsection{Seria 4 oraz seria 5 - Testy metody stochastycznej}
+Celem tej serii eksperymentów była weryfikacja korzyści płynących z zastosowania metody stochastycznej.
+W celu zapewnienia lepszych możliwości porównawczych wykonano pewne modyfikacje względem eksperymentów z poprzednich serii, co wymusiło również wykonanie niestochastycznej próby kontrolnej.
+Wprowadzone zmiany to:
+\begin{itemize}
+	\item Zmniejszenie liczby testowanych sieci do 75 460.
+	\item Zwiększenie wartości błędu docelowego do teoretycznie wystarczającego, lecz mniej efektywnego poziomu.
+	\item Zwiększenie limitu epok do 10 000.
+	\item Przyjęcie wartości współczynników z nisko efektywnych zakresów
+\end{itemize}
+
+Do przeprowadzenia eksperymentów wkorzystano kod przedstawiony na listingu \ref{lst:test3}
+\begin{lstlisting}[language=Rust,caption=Kod wykorzystany do przeprowadzenia 3 serii eksperymentów,label={lst:test3}]
+	fn main() {
+    //Vector for learning data
+    let t_data: Vec<(Array2<f64>, Array2<f64>)>;
+    //Vector for validation data
+    let v_data: Vec<(Array2<f64>, Array2<f64>)>;
+
+    let data = std::fs::read_to_string("zoo.data");
+
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = data::Animal::partitioned_list(animal_list, 0.75);
+    t_data = animal_list
+        .0
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    v_data = animal_list
+        .1
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    //    dbg!(&t_data);
+    let data_len = t_data.len();
+    let test_data = v_data
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
+
+    println!("Learning record count: {}", t_data.len());
+    let lr_step = vec![
+        0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95,
+    ];
+    let lr_inc_step = vec![
+        1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25,
+    ];
+    let lr_dec_step = vec![
+        0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7
+    ];
+    let er_step = vec![
+        1.0, 1.001, 1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08
+    ];
+
+    let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
+    let (sync_tx, sync_rx) = mpsc::sync_channel(16);
+    let (tx, rx) = mpsc::channel();
+
+    let tmp_threads = threads.clone();
+    thread::spawn(move || {
+        for s1 in 0..t_data.len() / 3 - 7 {
+            for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+                if s2 == 0 && s1 != 0 {
+                    continue;
+                }
+                let x = Network::new(vec![16, s1, s2, 7]);
+                //for lr in &lr_step {
+                for er in &er_step {
+                    let lr = 0.3;
+                    for lr_dec in &lr_dec_step {
+                        for lr_inc in &lr_inc_step {
+                            let mut net = x.clone();
+                            net.name = format!("{},{},{},{},{},{}", s1, s2, lr, lr_dec, lr_inc, er);
+                            let mut t_data = t_data.clone();
+                            let test_data = test_data.clone();
+
+                            let local_lrs = (lr, *lr_dec, *lr_inc);
+                            let local_sync_tx = sync_tx.clone();
+                            let local_tx = tx.clone();
+                            let local_er = *er;
+
+                            local_sync_tx.send(()).unwrap();
+                            let inner_threads = std::sync::Arc::clone(&tmp_threads);
+
+                            *inner_threads.lock().unwrap() += 1;
+                            thread::spawn(move || {
+                                net.sgd(
+                                    &mut t_data,
+                                    10000,
+                                    //data_len, //Próba kontrolna
+                                    data_len / 2, //Rozmiar próbek równy połowie długości całego zbioru uczącego
+                                    local_lrs.0,
+                                    Some(&test_data),
+                                    //None
+                                    Some((local_lrs.1, local_lrs.2)),
+                                    0.25 / data_len as f64,
+                                    10000,
+                                    Some(local_er),
+                                );
+                                local_tx.send(()).unwrap();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    loop {
+        let threads = std::sync::Arc::clone(&threads);
+        //println!("{}", threads.lock().unwrap());
+        rx.recv().unwrap();
+        //println!("{}", threads.lock().unwrap());
+        sync_rx.recv().unwrap();
+        *threads.lock().unwrap() -= 1;
+        if *threads.lock().unwrap() <= 0 {
+            break;
+        }
+    }
+
+}
+\end{lstlisting}
+
+Zgodnie z oczekiwaniami sieć wzorcowa osiągnęła względnie niską efektywność uczenia, co widać na wykresie \ref{Fig:Stoch1}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Stoch_1.png}
+	\caption{Poprawność klasyfikacji sieci 3-warstwowej przy er~=~1.07 S1~=~4 oraz S2~=~10}
+	\label{Fig:Stoch1}
+\end{figure}
+Taki stan jest korzystny dla eksperymentu, gdyż pozwoli na zaobserwowanie zarówno ewentualnej poprawy jak i pogorszenia poprawności klasyfikacji.
+Niestety w ramach serii nie raportowano liczby epok które sieć potrzebowała na naukę, co uniemożliwia dokładne zestawienie wyników pod względem prędkości uczenia.
+Porównanie takie byłoby dobrym sposobem porównania metody stochastycznej z domyślnym algorytmem, gdyż pod względem poprawności klasyfikacji różnice między nimi są pomijalne, co w przypadku sieci z wykresu \ref{Fig:Stoch1} prezentuje wykres \ref{Fig:Stoch2}.
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Stoch_2.png}
+	\caption{Poprawność klasyfikacji sieci 3-warstwowej uczonej metodą stochastyczną przy er~=~1.07 S1~=~4 oraz S2~=~10}
+	\label{Fig:Stoch2}
+\end{figure}
+Na przestrzeni eksperymentu odnotowano jedynie pojedyncze różnice pomiędzy siecią uczoną metodą stochastyczną a podstawowym algorytmem.
+W trakcie procesu uczenia zaobserwowano jednak dużo krótszy czas zakończenia serii
+
 
 \addcontentsline{toc}{section}{Literatura}
 
