@@ -1798,9 +1798,12 @@ Zgodnie z oczekiwaniami sieć wzorcowa osiągnęła względnie niską efektywno�
 	\label{Fig:Stoch1}
 \end{figure}
 Taki stan jest korzystny dla eksperymentu, gdyż pozwoli na zaobserwowanie zarówno ewentualnej poprawy jak i pogorszenia poprawności klasyfikacji.
-Niestety w ramach serii nie raportowano liczby epok które sieć potrzebowała na naukę, co uniemożliwia dokładne zestawienie wyników pod względem prędkości uczenia.
-Porównanie takie byłoby dobrym sposobem porównania metody stochastycznej z domyślnym algorytmem, gdyż pod względem poprawności klasyfikacji różnice między nimi są pomijalne, co w przypadku sieci z wykresu \ref{Fig:Stoch1} prezentuje wykres \ref{Fig:Stoch2}.
 
+
+Na przestrzeni eksperymentu odnotowano jedynie pojedyncze różnice pomiędzy siecią uczoną metodą stochastyczną a podstawowym algorytmem.
+W trakcie procesu uczenia zaobserwowano jednak dużo krótszy czas zakończenia serii, co sugeruje szybsze osiąganie przez taką sieć docelowego błędu.
+Niestety, w raporcie testowym nie zapisywano liczby epok wykonanych w procesie uczenia sieci, co uniemożliwia wykonanie porównania bez
+Porównanie takie byłoby dobrym sposobem porównania metody stochastycznej z domyślnym algorytmem, gdyż pod względem poprawności klasyfikacji różnice między nimi są pomijalne, co w przypadku sieci z wykresu \ref{Fig:Stoch1} prezentuje wykres \ref{Fig:Stoch2}.
 
 \begin{figure}[ht]
 	\centering
@@ -1808,10 +1811,236 @@ Porównanie takie byłoby dobrym sposobem porównania metody stochastycznej z do
 	\caption{Poprawność klasyfikacji sieci 3-warstwowej uczonej metodą stochastyczną przy er~=~1.07 S1~=~4 oraz S2~=~10}
 	\label{Fig:Stoch2}
 \end{figure}
-Na przestrzeni eksperymentu odnotowano jedynie pojedyncze różnice pomiędzy siecią uczoną metodą stochastyczną a podstawowym algorytmem.
-W trakcie procesu uczenia zaobserwowano jednak dużo krótszy czas zakończenia serii
 
 
+\clearpage
+\subsection{Seria 6 - testy osłabionego algorytmu adaptacyjnego}
+Poprzez osłabienie algorytmu adaptacyjnego rozumie się pozbawienie go zdolności do przywrócenia korzystniejszych wartości wag oraz biasów po przekroczeniu granicznego przyrostu błędu.
+Zmianę w kodzie wymaganą do wykonania tego testu prezentuje listing \ref{lst:Retarded0}
+\begin{lstlisting}[language=Rust,caption=Fragment funkcji sgd\(...\) - zakomentowanie linii przywracających zachowane wagi oraz biasy,label={lst:Retarded0}]
+	Some((dec, inc)) => {
+		// Saving state of network before readjustment of weights and biases
+		let saved_weights = self.weights.clone();
+		let saved_biases = self.biases.clone();
+		let previous_error = self.mse(training_data);
+
+		//Sub-loob performing learning step for each of the mini-batch
+		for mini_batch in &mut mini_batches {
+			//dbg!(&mini_batch);
+			self.update_mini_batch(mini_batch, eta, batch_count)
+		}
+
+		// Verification of newly achieved Mean Square Error
+		let new_error = self.mse(training_data);
+		if new_error < target_cost {
+			if let Some(data) = &test_data {
+				let output = self.evaluate(data);
+				println!("{},{}", self.name, output.1 as f64 / output.0 as f64);
+			}
+			break;
+		}
+		if new_error
+			> previous_error
+				* if let Some(perf_inc) = er {
+					perf_inc
+				} else {
+					MAX_PERF_INC
+				}
+		{
+			// Restoring backup
+
+			//Linie zakomentowane na potrzeby eksperymentu
+			//self.weights = saved_weights;
+			//self.biases = saved_biases;
+
+			// Adaptation - learning rate decreases
+			eta *= dec;
+		} else if new_error < previous_error {
+			// Adaptation - learning rate increases
+			eta *= inc;
+		}
+		// else statement does nothing - ommited
+	}
+\end{lstlisting}
+Przywrócenie to powoduje inwalidację obliczonych w poprzedniej iteracji algorytmu parametrów, co może być uznane za niepotrzebne poświęcanie czasu na dodatkowe obliczenia.
+Wrażenie to jest jednak mylne, co widzimy na wykresie \ref{Fig:Retarded1}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Retarded_1.png}
+	\caption{Poprawność klasyfikacji sieci 3-warstwowej uczonej przy  przy er~=~1.07 S1~=~4 oraz S2~=~10}
+	\label{Fig:Retarded1}
+\end{figure}
+Co istotne, widzimy dużo mniejszą rozdzielczość wartości metaparametrów dla których testowano sieć.
+Jest to spowodowane drastycznym spadkiem wydajności procesu uczenia takiej sieci.
+Spadek ten jest na tyle drastyczny że pomimo redukcji liczby testów do zaledwie kilkunastu tysięcy, podobniej jak w seriach 4 oraz 5, proces uczenia przy maksymalnej liczbie epok równej 10000 i względnie wysokim błędzie docelowym równym $0.25/\text{len}(\text{dataset})$ trwał około 30 godzin.
+W przypadku eksperymentów serii 4 oraz 5, w których badano większą liczbę sieci lecz przy tych samych parametrach startowych wynosił on nie więcej niż 5 godzin, zaś w seriach 2 oraz 3 w których badano znacznie więcej sieci, lecz przy niższym limicie epok, wynosił około 8 godzin.
+
+Dysproporcje czasowe występukjące w przypadku tej serii eksperymentów były na tyle znaczące że zdecydowano się na wykonanie pojedynczych eksperymentów z bardziej szczegółowym raportem, pozwalających na bardziej dokładne zbadanie zachowania sieci.
+W celu przeprowadzenia dodatkowego eksperymentu przyjęto parametry przedstawione na listingu \ref{lst:Retarded1}.
+
+\begin{lstlisting}[language=Rust,caption=Kod wykorzystany do przeprowadzenia dodatkowego eksperymentu w serii 6,label={lst:Retarded1}]
+	fn main() {
+    println!("Hello, world!");
+    //let x = Network::new(vec![16, 8, 7]);
+
+    //dbg!(&x);
+    //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
+
+    //Vector for learning data
+    let t_data: Vec<(Array2<f64>, Array2<f64>)>;
+    //Vector for validation data
+    let v_data: Vec<(Array2<f64>, Array2<f64>)>;
+
+    let data = std::fs::read_to_string("zoo.data");
+
+    let animal_list = data::Animal::new_list(&data.unwrap());
+    let animal_list = data::Animal::partitioned_list(animal_list, 0.75);
+    t_data = animal_list
+        .0
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    v_data = animal_list
+        .1
+        .iter()
+        .map(|a| a.into_training_arr2())
+        .collect::<Vec<_>>();
+
+    //    dbg!(&t_data);
+    let data_len = t_data.len();
+    let test_data = v_data
+        .iter()
+        .map(|(input, output)| {
+            (
+                input,
+                output
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+                    .unwrap(),
+            )
+        })
+        .map(|(a, s)| (a.clone(), s.0))
+        .collect::<Vec<_>>()
+        .to_owned();
+
+    println!("Learning record count: {}", t_data.len());
+//    let lr_step = vec![
+//        0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.95,
+//    ];
+    let lr_inc_step = vec![
+        1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4
+    ];
+    let lr_dec_step = vec![
+        0.99, 0.98, 0.97, 0.95, 0.93, 0.92, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6
+    ];
+
+//    let er_step = vec![
+//        1.0, 1.001, 1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08
+//    ];
+
+    let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
+    let (sync_tx, sync_rx) = mpsc::sync_channel(16);
+    let (tx, rx) = mpsc::channel();
+
+    let tmp_threads = threads.clone();
+    thread::spawn(move || {
+        //for s1 in 0..t_data.len() / 3 - 7 {
+            //for s2 in 0..(t_data.len() / 3 - 7 - s1) {
+                //if s2 == 0 && s1 != 0 {
+                //    continue;
+                //}
+        let (s1, s2) = (4,10);
+        let x = Network::new(vec![16, s1, s2, 7]);
+        //for lr in &lr_step {
+        //for er in &er_step {
+            let er = 1.07;
+            let lr = 0.3;
+            for lr_dec in &lr_dec_step {
+                for lr_inc in &lr_inc_step {
+                    let mut net = x.clone();
+                    net.name = format!("{},{},{},{},{},{}", s1, s2, lr, lr_dec, lr_inc, er);
+                    let mut t_data = t_data.clone();
+                    let test_data = test_data.clone();
+
+                    let local_lrs = (lr, *lr_dec, *lr_inc);
+                    let local_sync_tx = sync_tx.clone();
+                    let local_tx = tx.clone();
+                    let local_er = er;
+
+                    local_sync_tx.send(()).unwrap();
+                    let inner_threads = std::sync::Arc::clone(&tmp_threads);
+
+                    *inner_threads.lock().unwrap() += 1;
+                    thread::spawn(move || {
+                        net.sgd(
+                            &mut t_data,
+                            10000,
+                            data_len ,
+                            local_lrs.0,
+                            Some(&test_data),
+                            //None
+                            Some((local_lrs.1, local_lrs.2)),
+                            0.25 / data_len as f64 / 7.0,
+                            10000,
+                            Some(local_er),
+                        );
+                        local_tx.send(()).unwrap();
+                    });
+                }
+    //}
+    //}
+    //}
+        }
+    });
+
+    loop {
+        let threads = std::sync::Arc::clone(&threads);
+        //println!("{}", threads.lock().unwrap());
+        rx.recv().unwrap();
+        //println!("{}", threads.lock().unwrap());
+        sync_rx.recv().unwrap();
+        *threads.lock().unwrap() -= 1;
+        if *threads.lock().unwrap() <= 0 {
+            break;
+        }
+    }
+
+}
+\end{lstlisting}
+
+Przeprowadzony test pozwolił na porównanie zachowania pierwotnej i osłabionej wersji algorytmu.
+Ze względu na przeprowadzoną przed serią 4 modyfikację sposobu uziarniania generatora pseudolosowego, wyniki uczenia  są różne od tych otrzymanych w seriach 2 oraz 3, lecz nadal zachowują ogólny obserwowany w nich trend.
+Próbę kontrolną, dla dotychczasowego algorytmu prezentuje wykres \ref{Fig:Retarded2}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Retarded_2.png}
+	\caption{Poprawność klasyfikacji sieci uczonej standardowym algorytmem przy er~=~1.07 S1~=~4 oraz S2~=~10}
+	\label{Fig:Retarded2}
+\end{figure}
+Na wykresie widzimy podatność poprawności klasyfikacji głównie na zmiany współczynnika lr\_inc.
+Trend ten jest zachowany również w przypadku osłabionego algorytmu.
+Jednakże jak zaprezentowano na wykresie \ref{Retarded3} spadki poprawności klasyfikacji dla niekorzystnych parametrów są znacznie większe.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/Retarded_3.png}
+	\caption{Poprawność klasyfikacji sieci uczonej osłabionym algorytmem przy er~=~1.07 S1~=~4 oraz S2~=~10}
+	\label{Fig:Retarded3}
+\end{figure}
+
+Zauważalna była również wspomniana wcześniej różnica w czasie działania sieci.
+W przypadku algorytmu klasycznego sieć zakończyła naukę przed dotarciem do granicznej iteracji w 168 na 169 przypadków testowych.
+Średnia liczba iteracji (epok) wyniosła w tym przypadku  ok. 372 zaś średnia poprawność klasyfikacji - ok. 73\%
+W przypadku algorytmu ograniczonego, sieć zakończyła naukę przed osiągnięciem granicznej epoki jedynie w 62 spośród 169 przypadków testowych.
+Dysproporcja ta przełożyła się bezpośrednio na średnią liczbę epok, która wyniosła 6376 - blisko dwukrotność wartości osiągniętej przez algorytm klasyczny.
+Duża liczba epok nie przełożyła się jednak na lepsze wyniki poprawności klasyfikacji.
+Przy walidacji krzyżowej, sieć uczona osłabionym algorytmem osiągnęła śrendnio  jednie 43\% poprawności klasyfikacji, co potwierdza wysunięte na podstawie wykresów wnioski o gorszej efektywności takiego sposobu uczenia.
+
+\clearpage
 \addcontentsline{toc}{section}{Literatura}
 
 \begin{thebibliography}{4}

@@ -27,4 +27,5 @@
 \contentsline {subsubsection}{\numberline {4.3.2}Ogólny wpływ parametrów adaptacyjnych na efektywność uczenia sieci}{\footnotesize 53}{subsubsection.4.3.2}%
 \contentsline {subsubsection}{\numberline {4.3.3}Uogólniony wpływ współczynnika błędu granicznego na poprawność klasyfikacji}{\footnotesize 57}{subsubsection.4.3.3}%
 \contentsline {subsubsection}{\numberline {4.3.4}Seria 4 oraz seria 5 - Testy metody stochastycznej}{\footnotesize 60}{subsubsection.4.3.4}%
-\contentsline {section}{Literatura}{\footnotesize 62}{lstnumber.15.121}%
+\contentsline {subsection}{\numberline {4.4}Seria 6 - testy osłabionego algorytmu adaptacyjnego}{\footnotesize 65}{subsection.4.4}%
+\contentsline {section}{Literatura}{\footnotesize 72}{figure.28}%
