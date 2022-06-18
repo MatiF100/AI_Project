@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.6.1)  19 JUN 2022 00:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.6.1)  19 JUN 2022 00:27
 entering extended mode
 **./weiiszablon.tex
 (weiiszablon.tex
@@ -6125,11 +6125,7 @@ Overfull \hbox (14.22635pt too wide) in paragraph at lines 2020--2021
  [][] 
  []
 
-
-LaTeX Warning: Reference `Retarded3' on page \footnotesize 69 undefined on inpu
-t line 2026.
-
-<figures/Retarded_3.png, id=1740, 421.575pt x 316.0608pt>
+<figures/Retarded_3.png, id=1741, 421.575pt x 316.0608pt>
 File: figures/Retarded_3.png Graphic file (type png)
 <use figures/Retarded_3.png>
 Package pdftex.def Info: figures/Retarded_3.png  used on input line 2030.
@@ -6460,10 +6456,10 @@ Package rerunfilecheck Info: File `weiiszablon.out' has not changed.
 (rerunfilecheck)             Checksum: 7777A3AB5636D4B233F60C75F993A043;9224.
  ) 
 Here is how much of TeX's memory you used:
- 16264 strings out of 479334
- 236048 string characters out of 2856135
+ 16263 strings out of 479334
+ 236037 string characters out of 2856135
  1462804 words of memory out of 3000000
- 32135 multiletter control sequences out of 15000+200000
+ 32134 multiletter control sequences out of 15000+200000
  455973 words of font info for 61 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  83i,9n,88p,8042b,2324s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -6490,9 +6486,9 @@ public/lm/lmsy9.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/type1
 /public/lm/lmtt12.pfb><C:/Users/Mateusz/AppData/Local/Programs/MiKTeX/fonts/typ
 e1/public/lm/lmtti10.pfb>
 Output written on G:/RUST\projects\AI_Project\Documentation\out\weiiszablon.pdf
- (72 pages, 2917833 bytes).
+ (72 pages, 2917983 bytes).
 PDF statistics:
- 2124 PDF objects out of 2487 (max. 8388607)
+ 2125 PDF objects out of 2487 (max. 8388607)
  1319 named destinations out of 1440 (max. 500000)
  391 words of extra memory for PDF output out of 10000 (max. 10000000)
 
