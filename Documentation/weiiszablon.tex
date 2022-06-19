@@ -67,7 +67,7 @@ Metaparametry poddane badaniom to:
 \end{itemize}
 
 \subsection{Opis i przygotowanie wykorzystanych danych}
-W celu przeprowadzenia badań, wykorzystany został zbiór danych dostępny pod adresem: \url{https://archive.ics.uci.edu/ml/datasets/zoo}.
+W celu przeprowadzenia badań, wykorzystany został zbiór danych\cite{dataset} dostępny pod adresem: \url{https://archive.ics.uci.edu/ml/datasets/zoo}.
 Składa się na niego 101 rekordów opisanych 18 parametrami. Opisują one następujące cechy zwierzęcia:
 \begin{enumerate}
 	\item animal name - wartość tekstowa, stanowiąca nazwę zwierzęcia. Nieuwzględniana w procesie uczenia
@@ -102,7 +102,7 @@ W tym celu przydzielono $25\%$ rekordów należących do danej klasy do zbioru w
 
 \section{Zagadnienia teoretyczne związane z wykorzystaną siecią neuronową oraz algorytmem uczenia}
 \subsection{Model neuronu}
-Neuron jest podstawowym elementem sieci neuronowej.
+Neuron jest podstawowym elementem sieci neuronowej \cite{nndl}.
 Jego elementami są:
 \begin{itemize}
 	\item Zbiór wejść $x$ długości $L$
@@ -117,11 +117,11 @@ Jego elementami są:
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=12cm]{figures/models/neuronModel.png}
-	\caption{Graficzny model neuronu}
+	\caption{Graficzny model neuronu \cite{kiaNeuron}}
 	\label{Fig:neuron}
 \end{figure}
 
-Wartość sygnału wyściowego neuronu możemy określić wzorem:
+Wartość sygnału wyściowego neuronu możemy określić wzorem \cite{kiaNeuron}:
 \begin{equation}
 	\label{eq:neuronOut}
 	a = f\left(\sum\limits_{j=1}^{L}w_{j}x_{j} + b\right)
@@ -129,13 +129,13 @@ Wartość sygnału wyściowego neuronu możemy określić wzorem:
 
 W powyższym zapisie, $x_j$ oraz $w_j$ oznaczają odpowiednio kolejne wartości wejściowe i powiązane z nimi wagi (współczynniki wagowe).
 Zapis ten możemy jednakże uprościć, zakładając że $x = \left[ x_1, x_2, ..., x_L\right]^T$ będzie wektorem kolumnowym wejść, $w = \left[ w_1, w_2, ..., w_L\right]$ - macierzą wierszową powiązanych z wejściami wag, natomiast wartości $a$ oraz $b$ - skalarami.
-Wtedy równanie \ref{eq:neuronOut} przyjmie postać:
+Wtedy równanie \ref{eq:neuronOut} przyjmie postać \cite{kiaNeuron}:
 \begin{equation}
 	\label{eq:neuronVec}
 	a = f\left( w x + b \right)
 \end{equation}
 
-Ponadto istotnym w dalszych rozważaniach elementem modelu neuronu jest wyjście z bloku sumującego.
+Ponadto istotnym w dalszych rozważaniach elementem modelu neuronu jest wyjście z bloku sumującego. \cite{kiaNeuron}
 Oznaczając je jako $z$ otrzymamy:
 \begin{equation}
 	\label{eq:z}
@@ -145,14 +145,14 @@ Oznaczając je jako $z$ otrzymamy:
 Obliczona w ten sposób wartość, stanowi argument funkcji aktywacji neuronu.
 Funkcja ta przekształca wartość $z$ na inną wartość uzależnioną od jej charakterystyki.
 Na potrzeby projektu, przyjęto że rolę tę będzie pełniła funkcja sigmoidalna (logsig).
-Jej wartość możemy obliczyć zgodnie ze wzorem:
+Jej wartość możemy obliczyć zgodnie ze wzorem \cite{nndl}:
 \begin{equation}
 	\label{eq:sigmoid}
 	f(z) =  \frac{1}{1 +\exp(-z)}
 \end{equation}
 
 W procesie uczenia istotna będzie także wartość pochodnej tej funkcji w danym punkcie.
-W przypadku funkcji sigmoidalnej można ją sprowadzić do następującej postaci:
+W przypadku funkcji sigmoidalnej można ją sprowadzić do następującej postaci\cite{nndl}:
 \begin{equation}
 	\label{eq:sigmoidPrime}
 	f'(z) = f(z) \cdot \left(1-f\left(z\right)\right)
@@ -162,12 +162,12 @@ Właściwość ta może być użyta do zmniejszenia liczby wykonywanych przez al
 
 
 \subsection{Sieć neuronowa jednowarstwowa}
-Siecią neuronową jednowarstwową nazywamy taką sieć, w której neurony nie są połączone ze sobą bezpośrednio, a jedynie otrzymują dane na wejściu i podają wynik na wyjście.
+Siecią neuronową jednowarstwową nazywamy taką sieć, w której neurony nie są połączone ze sobą bezpośrednio, a jedynie otrzymują dane na wejściu i podają wynik na wyjście \cite{kiaSingleLayer}.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=12cm]{figures/models/singleLayerModel.png}
-	\caption{Model prostej sieci jednowarstwowej}
+	\caption{Model prostej sieci jednowarstwowej \cite{kiaSingleLayer}}
 	\label{Fig:singleNetwork}
 \end{figure}
 
@@ -175,7 +175,7 @@ Wejściem każdego neuronu jest wektor sygnałów wejściowych $x$, zaś wyjści
 Ponadto możemy zdefiniować również wektor przesunięć $b = \left[ b_1, b_2, \cdots, b_K \right]$
 Liczba wyjść z sieci jest tożsama z liczbą neuronów.
 
-Wagi przyporządkowane wejściom można wyrazić w postaci macierzy o rozmiarach $K \times L$ gdzie $L$ oznacza liczbę wejść sieci, a $K$ liczbę neuronów.
+Wagi przyporządkowane wejściom można wyrazić w postaci macierzy o rozmiarach $K \times L$ gdzie $L$ oznacza liczbę wejść sieci, a $K$ liczbę neuronów. \cite{kiaSingleLayer}
 $$\bm{w} = \left[
 	\begin{array}{cccc}
 		w_{11} & w_{12} & \cdots & w_{1L} \\
@@ -185,23 +185,23 @@ $$\bm{w} = \left[
 	\end{array}
 	\right]$$
 
-Przy założeniu że każdy neuron realizuje tą samą funkcję aktywacji, działanie sieci jednowartwowej możemy wyrazić w postaci macierzowej:
+Przy założeniu że każdy neuron realizuje tą samą funkcję aktywacji, działanie sieci jednowartwowej możemy wyrazić w postaci macierzowej \cite{kiaSingleLayer}:
 \begin{equation}
 	\label{eq:singleLayerOut}
 	a = f\left( wx + b \right)
 \end{equation}
 \subsection{Sieć neuronowa wielowarstwowa}
 Siecią neuronową wielowarstwową, nazywamy taką sieć w której neurony ułożone są w dwóch lub więcej połączonych ze sobą warstwach.
-Możemy zatem powiedzieć że jest to pewna liczba połączonych kaskadowo sieci jednowarstowych, a wyjście pojedynczej warstwy jest równocześnie wejściem warstwy następnej.
+Możemy zatem powiedzieć że jest to pewna liczba połączonych kaskadowo sieci jednowarstowych, a wyjście pojedynczej warstwy jest równocześnie wejściem warstwy następnej \cite{kiaMultiLayer}.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=14cm]{figures/models/manyLayerModel.png}
-	\caption{Model prostej sieci trójwarstwowej}
+	\caption{Model prostej sieci trójwarstwowej \cite{kiaMultiLayer}}
 	\label{Fig:multiNetwork}
 \end{figure}
 
 W przypadku tego typu sieci ilość macierzy wag jest równa liczbie warstw neuronów.
-Oznaczając $a^{(l)}$ jako wyjście, $w^{(l)}$ jako macierz wag, $b^{(l)}$ jako macierz biasów, a $f^{(l)}$ jako funkcję aktywacji neuronów $l-$tej warstwy oraz wykorzystując równanie \ref{eq:singleLayerOut}, w przypadku sieci trójwarstwowej otrzymamy równania:
+Oznaczając $a^{(l)}$ jako wyjście, $w^{(l)}$ jako macierz wag, $b^{(l)}$ jako macierz biasów, a~$f^{(l)}$ jako funkcję aktywacji neuronów $l-$tej warstwy oraz wykorzystując równanie \ref{eq:singleLayerOut}, w przypadku sieci trójwarstwowej otrzymamy równania \cite{kiaMultiLayer}:
 \begin{equation}
 	\label{eq:tripleLayerOut}
 	\begin{aligned}
@@ -211,7 +211,7 @@ Oznaczając $a^{(l)}$ jako wyjście, $w^{(l)}$ jako macierz wag, $b^{(l)}$ jako 
 	\end{aligned}
 \end{equation}
 
-Następnie, wykorzystując równania \ref{eq:tripleLayerOut}, możemy opisać działanie całej sieci trójwarstwowej równaniem:
+Następnie, wykorzystując równania \ref{eq:tripleLayerOut}, możemy opisać działanie całej sieci trójwarstwowej równaniem \cite{kiaMultiLayer}:
 
 \begin{equation}
 	\label{eq:tripleLayerCombined}
@@ -231,31 +231,31 @@ Wyznaczenie błędu dla pojedynczej pary uczącej pozwala na zdefiniowanie równ
 	C\left( w, b, X, a\right) = \frac{1}{n} \sum\limits_{i = 1}^{|X|} E(X_i)^2
 \end{equation}
 
-W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$ wszystkich jej biasów, $X$ zbiór wszystkich zestawów wejściowych, $x$ pojedynczy zestaw wejść sieci, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór uzyskanych wyjść z sieci.
-Zakładając, że w procesie uczenia wartości $X$ pozostają stałe natomiast wartości $a$ są uzależnione od $X$, $w$ oraz $b$, możemy uprościć oznaczenie funkcji do postaci $C (w,b)$ oraz $E(w, b, x)$.
+W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$~wszystkich jej biasów, $X$ zbiór wszystkich zestawów wejściowych, $x$ pojedynczy zestaw wejść sieci, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór uzyskanych wyjść z sieci.
+Zakładając, że w procesie uczenia wartości $X$~pozostają stałe natomiast wartości $a$ są uzależnione od $X$, $w$ oraz $b$, możemy uprościć oznaczenie funkcji do postaci $C (w,b)$ oraz $E(w, b, x)$.
 Funkcje te są ze sobą powiązane i dążą do 0 gdy wartości otrzymywane na wyjściu sieci są bliskie wartościom oczekiwanym, i rośnie wraz ze wzrostem różnicy pomiędzy nimi.
-W związku z powyższym, należy znaleźć taką metodę, która pozwoli na minimalizację wartości funkcji $E(w, b, x)$ oraz $C(w,b)$.
+W związku z powyższym, należy znaleźć taką metodę, która pozwoli na minimalizację wartości funkcji $E(w, b, x)$ oraz $C(w,b)$. \cite{nndl}
 
 \subsubsection{Ogólny algorytm gradientowy}
-Celem zobrazowania problemu rozważmy prostą funkcję $C(v_1, v_2)$ zobrazowaną na rysunku \ref{Fig:simpleCost}.
+Celem zobrazowania problemu rozważmy prostą funkcję $C(v_1, v_2)$ zobrazowaną na rysunku \ref{Fig:simpleCost} \cite{nndl}.
 Naszym celem jest znalezienie jej globalnego minimum.
 Teoretycznie możliwe jest jego wyznaczenie metodą analityczną, jednakże według literatury \cite{nndl} jest to rozwiązanie mało wydajne, szczególnie gdy rozważymy funkcje więcej niż kilku zmiennych.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=12cm]{figures/models/gradientExample.png}
-	\caption{Przykładowa funkcja 2 zmiennych}
+	\caption{Przykładowa funkcja 2 zmiennych \cite{nndl}}
 	\label{Fig:simpleCost}
 \end{figure}
 
 Obserwując rysunek \ref{Fig:simpleCost} możemy jednak dojść do znacznie prostszej obliczeniowo metody.
-Przyjmując bliskie zeru wartości $\Delta v_1$ oraz $\Delta v_2$ możemy przyjąć zmianę wartości funkcji $C(v_1, v_2)$ na poziomie:
+Przyjmując bliskie zeru wartości $\Delta v_1$ oraz $\Delta v_2$ możemy przyjąć \cite{nndl} zmianę wartości funkcji $C(v_1, v_2)$ na poziomie:
 \begin{equation}
 	\label{eq:deltaC}
 	\Delta C \approx \frac{\delta C}{\delta v_1} \Delta v_1 + \frac{\delta C}{\delta v_2} \Delta v_2
 \end{equation}
 
-Na podstawie powyższego równania możemy zdefiniować wektor zmian:
+Na podstawie powyższego równania możemy \cite{nndl} zdefiniować wektor zmian:
 \begin{equation}
 	\label{eq:changeVector}
 	\Delta v = (\Delta v_1, \Delta v_2)^T
@@ -266,19 +266,19 @@ oraz tzw. wektor gradientu:
 	\nabla C = \left(\frac{\delta C}{\delta v_1},\frac{\delta C}{\delta v_1}\right)^T
 \end{equation}
 
-Wykorzystując powyższe definicje, równanie \ref{eq:gradientVector} możemy zapisać w postaci:
+Wykorzystując powyższe definicje, równanie \ref{eq:gradientVector} możemy \cite{nndl} zapisać w postaci:
 \begin{equation}
 	\label{eq:costGradientVector}
 	\Delta C \approx \nabla C \cdot \Delta v
 \end{equation}
 
-Problemem przy równaniu \ref{eq:costGradientVector} jest wyznaczenie optymalnego wektora $\Delta v$, tak aby zagwarantować ujemną wartość $\Delta C$. W tym celu, możemy przyjąć wartości opisywane równaniem \ref{eq:changeVector} jako równe:
+Problemem przy równaniu \ref{eq:costGradientVector} jest wyznaczenie optymalnego wektora $\Delta v$, tak aby zagwarantować ujemną wartość $\Delta C$. W tym celu, możemy \cite{nndl} przyjąć wartości opisywane równaniem \ref{eq:changeVector} jako równe:
 \begin{equation}
 	\label{eq:lrNabla}
 	\Delta v = -\eta \nabla C
 \end{equation}
 
-Wartość $\eta$ nazywana jest ,,współczynnikiem uczenia'' i przyjmuje bliskie zeru, dodatnie wartości. Wykorzystując powyższą definicję, możemy zapisać równanie \ref{eq:costGradientVector} w postaci:
+Wartość $\eta$ nazywana jest ,,współczynnikiem uczenia'' i przyjmuje bliskie zeru, dodatnie wartości \cite{nndl}. Wykorzystując powyższą definicję, możemy zapisać równanie \ref{eq:costGradientVector} w postaci:
 \begin{equation*}
 	\begin{aligned}
 		\Delta C &\approx - \eta \nabla C \cdot \nabla C\\
@@ -286,7 +286,7 @@ Wartość $\eta$ nazywana jest ,,współczynnikiem uczenia'' i przyjmuje bliskie
 	\end{aligned}
 \end{equation*}
 W tej postaci równania widzimy, że dla odpowiednio niskiego współczynnika $\eta$ zagwarantowany jest spadek wartości funkcji kosztu $C(v)$.
-Wykorzystując właściwość opisaną równaniem \ref{eq:lrNabla} możemy wyznaczyć nowe wartości zmiennych zawartych w wektorze $v$:
+Wykorzystując właściwość opisaną równaniem \ref{eq:lrNabla} możemy \cite{nndl} wyznaczyć nowe wartości zmiennych zawartych w wektorze $v$:
 \begin{equation}
 	\begin{aligned}
 		v' &= v - \eta \nabla C \\
@@ -295,12 +295,12 @@ Wykorzystując właściwość opisaną równaniem \ref{eq:lrNabla} możemy wyzna
 \end{equation}
 
 Wielokrotnie aplikując powyższą regułę, jesteśmy w stanie podążać za gradientem aż do osiągnięcia minimum.
-Literatura \cite{nndl} definiuje ją jako ,,algorytm spadku gradient'', ale jednocześnie wspomina że w niektórych sytuacjach, może nie być w pełni skuteczna.
+Literatura \cite{nndl} definiuje ją jako ,,algorytm spadku gradientu'', wspominając też że w niektórych sytuacjach, może nie być w pełni skuteczna.
 
 \subsubsection{Zastosowanie algorytmu gradientowego w sieciach wielowarstwowych}
 
-Algorytm gradientowy może zostać wykorzystany do minimalizacji funkcji przedstawionej równaniem \ref{eq:deltaC}, poprzez odnajdowanie wartości wag oraz biasów minimalizujących funkcję kosztu.
-Wykorzystując oznaczenia $w^{(l)}_{ij}$ jako j-tą wagę i-tego neuronu l-tej warstwy oraz $b^{(l)}_i$ jako bias i-tego neuronu w l-tej warstwie, możemy wyznaczyć ich wartości w kolejnych iteracjach (epokach) procesu uczenia:
+Algorytm gradientowy może zostać wykorzystany do minimalizacji funkcji przedstawionej równaniem \ref{eq:deltaC}, poprzez odnajdowanie wartości wag oraz biasów minimalizujących funkcję kosztu \cite{nndl}.
+Wykorzystując oznaczenia $w^{(l)}_{ij}$ jako j-tą wagę i-tego neuronu l-tej warstwy oraz $b^{(l)}_i$ jako bias i-tego neuronu w l-tej warstwie, możemy \cite{nndl} wyznaczyć ich wartości w kolejnych iteracjach (epokach) procesu uczenia:
 \begin{equation}
 	\label{eq:weightUpdate}
 	{w'}^{(l)}_{ij} = w^{(l)}_{ij} - \eta \frac{\partial E}{\partial w^{(l)}_{ij}}
@@ -310,7 +310,7 @@ Wykorzystując oznaczenia $w^{(l)}_{ij}$ jako j-tą wagę i-tego neuronu l-tej w
 	 {b'}^{(l)}_{i} = b^{(l)}_{i} - \eta \frac{\partial E}{\partial b^{(l)}_{i}}
 \end{equation}
 
-Przyjmując jako funkcję kosztu błąd średniokwadratowy, przy założeniu wystąpienia wielu danych uczących, możemy ją zapisać w postaci:
+Przyjmując jako funkcję kosztu błąd średniokwadratowy, przy założeniu wystąpienia wielu danych uczących, możemy \cite{nndl} ją zapisać w postaci:
 \begin{equation}
 	C = \frac{1}{|X|} \sum_{i=1}^{|X|} E(w, b, X_i)^2
 \end{equation}
@@ -372,10 +372,10 @@ Ogólne wzory na pochodne dla warstw 1-3 wymagane przez równania \ref{eq:weight
 \subsubsection{Metoda stochastycznego spadku gradientu}
 Jednym z problemów algorytmu spadku gradientu, objawiającym się przy dużej liczbie rekordów uczących \cite{nndl} jest długi czas potrzebny na obliczanie wartości pochodnych w równaniu \ref{eq:gradientVector}.
 Celem zniwelowania tego problemu można wykorzystać metodę zwaną ,,stochastycznym spadkiem gradientu''.
-Polega ona na oszacowaniu rzeczywistego gradientu $\nabla C$ poprzez obliczenie $\nabla C_x$ dla losowo wybranej próbki danych uczących.
+Polega ona na oszacowaniu rzeczywistego gradientu $\nabla C$ poprzez obliczenie $\nabla C_x$ dla losowo wybranej próbki danych uczących \cite{nndl} \cite{nnd}.
 Poprzez odpowiednie dobranie rozmiaru próbek, oraz ich odpowiednie uśrednienie, możemy uzyskać dobre przybliżenie rzeczywistego gradientu $\nabla C$.\cite{nndl}
 Elementy pojedynczej próbki możemy oznaczyć jako $X_1, X_2, \ldots , X_m$
-Zakładając odpowiednio duży rozmiar $m$ możemy przyjąć za prawdziwe równanie:
+Zakładając odpowiednio duży rozmiar $m$ możemy przyjąć za prawdziwe równanie \cite{nndl}:
 \begin{equation}
 	\label{eq:stochasticGradient}
 	\frac{ \sum_{j=1}^{m} \nabla C_{X_j}}{m} \approx \frac{ \sum_x \nabla C_x}{n} = \nabla C
@@ -388,22 +388,22 @@ Przenosząc czynnik $\frac{1}{m}$ przed znak sumy, otrzymamy:
 \end{equation}
 
 Wartym zauważenia jest też fakt występowania różnych konwencji uśredniania czy też skalowania gradientu stochastycznego. \cite{nndl}
-Niektóre źródła mówią o braku konieczności ich stosowania gdyż wpływają na działanie sieci jedynie pośrednio, poprzez modyfikację wartości współczynnika uczenia.
+W źródłach \cite{nndl} można znaleźć informację o braku konieczności ich stosowania gdyż wpływają na działanie sieci jedynie pośrednio, poprzez modyfikację wartości współczynnika uczenia.
 Z tego też powodu, w dalszej implementacji przyjęto współczynnik równy stosunkowi rozmiaru próbki do rozmiaru całego zbioru uczącego.
 
 \subsubsection{Adaptacyjny współczynnik uczenia}
 W równaniu \ref{eq:lrNabla} wprowadzono pojęcie współczynnika uczenia.
 Standardowa metoda gradientowa zakłada że jest on stały przez cały okres uczenia sieci, a jego odpowiedni dobór jest jednym z kryteriów koniecznych do poprawnego przebiegu procesu uczenia.
-Nie jest to jednak rozwiązanie optymalne, gdyż zbyt duża jego wartość może znacząco utrudnić osiągnięcie minimum funkcji błędu a w skrajnych przypadkach spowodować rozbiegnięcie procesu uczenia.
+Nie jest to jednak rozwiązanie optymalne \cite{nnd}, gdyż zbyt duża jego wartość może znacząco utrudnić osiągnięcie minimum funkcji błędu a w skrajnych przypadkach spowodować rozbiegnięcie procesu uczenia.
 Zbyt mała jego wartość również jest niekorzystna gdyż znacznie wydłuża czas potrzebny na osiągnięcie celu uczenia - definiowanego jako minimalizacja funkcji wyrażonej równaniem \ref{eq:costFunction}.
 
-Jedną z metod pozwalających zniwelować ten problem, jest metoda adaptacyjnej korekty współczynnika uczenia $\eta $\cite{kiaAcc}.
+Jedną z metod pozwalających zniwelować ten problem, jest metoda adaptacyjnej korekty współczynnika uczenia $\eta $\cite{kiaAcc} \cite{nnd}.
 Przyjmując wartość błędu w chwili czasu $t$:
 \begin{equation}
 	\label{eq:costFunctionTimed}
 	MSE(t) = \frac{1}{2n} \sum_{i=1}^{M}  || y_{i}(t) - a(t) ||^2
 \end{equation}
-Możemy zdefiniować sposób korekty współczynnika uczenia jako:
+Możemy \cite{kiaAcc} \cite{nnd} zdefiniować sposób korekty współczynnika uczenia jako:
 \begin{equation}
 	\label{eq:adaptiveLR}
 	\eta \left( t + 1 \right)  =
@@ -414,7 +414,7 @@ Możemy zdefiniować sposób korekty współczynnika uczenia jako:
 	\end{cases}
 \end{equation}
 gdzie $\xi_d$ $\xi_i$ są odpowiednio współczynnikami zmniejszania i zwiększania wartości współczynnika uczenia, zaś $er$ określa dopuszczalną krotność przyrostu błędu.
-Podejście takie powoduje wprawdzie konieczność ustalenia dodatkowych parametrów w procesie uczenia, lecz eliminuje problem doboru współczynnika uczenia.
+Podejście takie powoduje wprawdzie konieczność ustalenia dodatkowych parametrów w procesie uczenia, lecz częściowo eliminuje \cite{nnd} problem doboru współczynnika uczenia.
 Jeśli będzie on zbyt duży, zostanie zredukowany do pożądanego poziomu ze względu na wzrastający poziom błedu.
 Jednocześnie zbyt niska wartość $\eta$ zostanie zwiększona kiedy proces uczenia natrafi na bardziej optymalne warunki.
 
@@ -431,7 +431,7 @@ W tym celu wykorzystany został język programowania ogólnego przeznaczenia - R
 	\item ndarray 0.15.4 - wykorzystywana do obliczeń związanych z algebrą liniową, przede wszystkim operacji na macierzach
 	\item rand 0.8.5 - wykorzystywana do generowania liczb losowych
 \end{itemize}
-Pełny kod gotowy do kompilacji i uruchomienia znajduje się na repozytorium: \url{https://github.com/MatiF100/AI_Project}.
+Pełny kod gotowy do kompilacji i uruchomienia znajduje się na repozytorium:\\ \url{https://github.com/MatiF100/AI_Project}.
 
 \subsection{Implementacja struktury sieci}
 \subsubsection{Podstawowa struktura reprezentująca sieć}
@@ -541,7 +541,7 @@ fn feed_forward(&self, mut a: Array2<f64>) -> Array2<f64> {
 Ostatnią funkcją konieczną do działania sieci jest funkcja feedforward, pobierająca dane z wejścia sieci, i zwracająca wynikowy wektor stopnia aktywacji neuronów wyjściowych.
 
 \subsubsection{Algorytm uczenia sieci}
-\begin{lstlisting}[language=Rust,caption=Realizacja funkcji stochastycznego spadku gradientu,label={lst:sgd}]
+\begin{lstlisting}[language=Rust,caption=Realizacja funkcji stochastycznego spadku gradientu oraz funkcji błędu średniokwadratowego,label={lst:sgd}]
  fn sgd(
 	&mut self,
 	training_data: &mut Vec<(Array2<f64>, Array2<f64>)>,
@@ -631,6 +631,18 @@ Ostatnią funkcją konieczną do działania sieci jest funkcja feedforward, pobi
 			//println!("Epoch {} complete!", j);
 		}
 	}
+}
+fn mse(&self, training_data: &Vec<(Array2<f64>, Array2<f64>)>) -> f64 {
+training_data
+	.iter()
+	// Performing forward pass to determine network's outputs for entire training set
+	.map(|v| (self.feed_forward(v.0.clone()), v.1.clone()))
+	// Calculating error for each training pair (quadratic cost)
+	.map(|v| (v.0 - v.1).fold(0.0, |_, val| val.powf(2.0)) / 2.0)
+	// Calculating Mean Squared Error - average squared cost over all training pairs
+	.map(|e| e.powf(2.0))
+	.sum::<f64>()
+	/ training_data.len() as f64
 }
 \end{lstlisting}
 
@@ -1051,7 +1063,7 @@ impl Animal {
 \end{lstlisting}
 
 Struktura Animal przedstawiona na listingu \ref{lst:loadData} pozwala na przechowanie rekordów uczących w postaci obiektów, co ułatwia dalszą manipulację nimi.
-Powiązane z nią funkcje pozwalają na utworzenie nowej listy zwierząt na bazie danych odczytanych z pliku oraz jej konwersję do formatu wymaganego przez sieć neuronową zaprezentowaną na listingu \ref{lst:netStructure}.
+Powiązane z~nią funkcje pozwalają na utworzenie nowej listy zwierząt na bazie danych odczytanych z~pliku oraz jej konwersję do formatu wymaganego przez sieć neuronową zaprezentowaną na listingu \ref{lst:netStructure}.
 
 \clearpage
 \section{Eksperymenty}
@@ -1192,7 +1204,7 @@ W tym celu wykorzystano mechanizm wątków oraz system komunikacji kolejkowej ,,
 \subsection{Seria 1 - Testy poprawności działania implementacji sieci}
 Celem pierwszej serii eksperymentów była weryfikacja poprawności implementacji struktury sieci oraz algorytmów jej uczenia.
 W tym celu zastosowano proces uczenia dla prostych przypadków 2-wejściowych bramek logicznych AND, OR oraz XOR.
-W jej trakcie odnotowano niespodziewaną, istotną dla dalszych testów cechę implementacji.
+W~jej trakcie odnotowano niespodziewaną, istotną dla dalszych testów cechę implementacji.
 Prawodpodobnie z powodu przyjęcia funkcji sigmoidalnej dla neuronów warstwy wyjściowej oraz sposobu interpretacji zwracanej przez sieć wyników, ustalenie granicy błędu docelowego na równą
 \begin{equation*}
     \text{err\_goal} = 0.25 / n
@@ -1200,7 +1212,7 @@ Prawodpodobnie z powodu przyjęcia funkcji sigmoidalnej dla neuronów warstwy wy
 Przy $n$ oznaczającym długość zbioru uczącego, powodowało występowanie dużej liczby błędów podczas walidacji działania sieci, nawet na zbiorze uczącym.
 Dalsze testy wykazały zwiększenie efektywności wskazań sieci przy kilkukrotnym zmniejszeniu wartości błędu docelowego.
 Wynik 100\% poprawnej klasyfikacji był osiągany regularnie, dla różnych warunków startowych, przy wartości $\text{err\_goal} = \frac{0.25}{2n}$
-Z tego powodu, w części kolejnych eksperymentów również przyjmowano niższe wartości błędu docelowego, .
+Z tego powodu, w części kolejnych eksperymentów również przyjmowano niższe wartości błędu docelowego.
 
 
 \begin{lstlisting}[language=Rust,caption=Skrypt uczący dla bramki logicznej XOR,label={lst:example_xor}]
@@ -1259,7 +1271,7 @@ Zastosowanie jedynie 1 warstwy sprawdziło się zarówno w przypadku bramki AND 
 
 \clearpage
 \subsection{Seria 2 - Badanie wpływu metaparametrów sieci na przebieg oraz wynik procesu uczenia}
-W tej serii eksperymentów przetestowano 520 520 różnych konfiguracji sieci neuronowych.
+W tej serii eksperymentów przetestowano 520520 różnych konfiguracji sieci neuronowych.
 Przyjęto też arbitralne ziarno generatora liczb losowych, dla którego sieć wykazywała nienajlepsze efekty uczenia.
 Takie podejście pozwoliło na lepszą obserwację wpływu parametrów na przebieg uczenia, niż w przypadku zestawu parametrów sieci gwarantujących pełną poprawność w większości sytuacji.
 Modyfikację przykładowego kodu wykorzystaną do ich przeprowadzenia prezentuje listing \ref{lst:test1}.
@@ -1326,14 +1338,14 @@ Analizując je widzimy dużą skuteczność procesu uczenia dla sieci 2-warstwow
 	\label{Fig:S1S2_1}
 \end{figure}
 
-W przypadku sieci 2-warstwowych, pełną poprawność klasyfikacji zazwyczaj obserwujemy przy mniej niż 1000 epokach, co nie ma miejsca w przypadku sieci 3-warstwowej.
+W przypadku sieci 2-warstwowych, pełną poprawność klasyfikacji zazwyczaj obserwujemy przy mniej niż 1000 epokach, co nie ma miejsca w przypadku sieci\\ 3-warstwowej.
 Sieć 3-warstwowa osiągała 100\% poprawność klasyfikacji jedynie w pojedynczych przypadkach.
 Może to sugerować że następuje przewymiarowanie sieci i traci ona zdolność uogólniania.
 Alternatywnie, możliwym jest także konieczność dłuższego uczenia takiej sieci.
-Wizualizację wyników testu widzimy na rysunku \ref{Fig:S1S1_1}.
+Wizualizację wyników testu widzimy na rysunku \ref{Fig:S1S2_1}.
 Podobne wyniki uzyskano dla znacznej większości spośród wszystkich przetestowanych sieci.
 
-Interesujący efekt został natomiast uzyskany dla niskiego wyjścoiwego współczynnika uczenia.
+Interesujący efekt został natomiast uzyskany dla niskiego wyjściowego współczynnika uczenia.
 Charakterystyczny dla sieci z niskim współczynnikiem uczenia jest wykres \ref{Fig:S1S2_2}.
 
 
@@ -1345,7 +1357,7 @@ Charakterystyczny dla sieci z niskim współczynnikiem uczenia jest wykres \ref{
 \end{figure}
 
 W jego przypadku widzimy silną punktowość sieci.
-Poprawność klasyfikacji przy niektórych ilościach neuronów w poszczególnych warstwach jest podobna jak w eksperymentach z wyższym współczynnikiem uczenia, zaś w innych spada poniżej 40\%.
+Poprawność klasyfikacji przy niektórych ilościach neuronów w poszczególnych warstwach jest podobna jak w~eksperymentach z wyższym współczynnikiem uczenia, zaś w innych spada poniżej 40\%.
 Prawdopodobną przyczyną jest duża podatność takiej sieci na parametry początkowe, zwłaszcza dobór wag.
 Mimo inicjalizacji generatora pseudolosowego stałym ziarnem, stan wag może być mniej lub bardziej odległy od optymalnego w zależności od liczby neuronów w poszczególnych warstwach.
 
@@ -1366,7 +1378,7 @@ Widzimy że najlepsza poprawność klasyfikacji wystąpiła dla małych wartośc
 Współczynnik lr\_dec w tym przypadku nie miał zauważalnego wpływu.
 Podobnie w przypadku większości sieci dwuwarstwowych, efekt modyfikatorów był mało zauważalny, co przedstawia rysunek \ref{Fig:IncDec2}.
 W tym przypadku jednakże, powodem jest ogólnie duża skuteczność sieci jednowarstwowych.
-Większość z nich z łatwością osiąga pełną poprawność klasyfikacji, występują jedynie pojedyncze odchyły bez widocznej zależności.
+Większość z nich z~łatwością osiąga pełną poprawność klasyfikacji, występują jedynie pojedyncze odchyły przy bliskiej jedności wartości lr\_dec.
 
 \begin{figure}[ht]
 	\centering
@@ -1400,7 +1412,7 @@ Sugeruje to że wartość taka jest już zbyt mała, i pomimo zastosowania  meto
 	\label{Fig:IncDec4}
 \end{figure}
 
-Skuteczność adaptacyjnego współczynnika uczenia objawia się najbardziej w sieciach 3-warstwowych.
+Skuteczność adaptacyjnego współczynnika uczenia objawia się najbardziej w~sieciach 3-warstwowych.
 Przykładowy wynik uczenia dla takiej sieci obrazuje wykres \ref{Fig:IncDec5}.
 W tym przypadku wpływ wartości parametrów adaptacyjnych jest dużo bardziej widoczny niż w poprzednich przykładach.
 
@@ -1425,6 +1437,16 @@ Wprawdzie ze względu na większą liczbę neuronów, sieć osiągnęła pełną
 	\label{Fig:IncDec6}
 \end{figure}
 
+W ramach eksperymentu wykonano także test zachowania sieci przy współczynniku uczenia równym 10.
+Ze względu na charakter wykonanej implementacji, spodziewano się niewielkich różnic względem innych wartości współczynnika uczenia.
+Oczekiwania te potwierdza wykres \ref{Fig:IncDecHigh}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=16cm]{figures/IncDec_High.png}
+	\caption{Zależność poprawności klasyfikacji od parametrów adaptacyjnych przy lr~=~10, S1~=~3 oraz S2~=~10}
+	\label{Fig:IncDecHigh}
+\end{figure}
+
 \clearpage
 \subsubsection{Wpływ początkowej wartości współczynnika uczenia na proces uczenia}
 Badanie to przeprowadzono nadmiarowo, celem określenia najlepszego współczynnika uczenia do przeprowadzenia dalszych testów.
@@ -1445,7 +1467,7 @@ Z tego też powodu w kolejnej serii testów przyjęto wartość współczynnika 
 \subsection{Seria 3 - Badanie wpływu parametru błędu granicznego na przebieg oraz wynik procesu uczenia}
 W tej serii powtórzono eksperymenty z serii 2, ale przy stałym współczynniku uczenia równym 0.3 i zmiennym współczynnikiem przyrostu błędu adaptacyjnego współczynnika uczenia.
 Wykorzystany w tym celu kod prezentuje listing \ref{lst:test2}
-W ramach serii wykonano 468 468 testów niezależnych sieci, przy różnych parametrach początkowych.
+W ramach serii wykonano 468468 testów niezależnych sieci, przy różnych parametrach początkowych.
 Podobnie jak w serii drugiej, wagi oraz biasy zainicjowane były stałym ziarnem.
 
 \begin{lstlisting}[language=Rust,caption=Kod wykorzystany do przeprowadzenia 3 serii eksperymentów,label={lst:test2}]
@@ -1690,7 +1712,7 @@ Pierwszy podobny do trendu dla sieci 2-warstwowych prezentuje wykres \ref{Fig:Er
 
 Jest to zachowanie typowe dla sieci o względnie dużej liczbie neuronów w dwóch pierwszych warstwach.
 Wskazuje to na ogólnie dobrą efektywność takich sieci, i idący za tym szeroki zakres korzystnych wartości współczynnika er.
-Reguła ta nie jest jednak stała, i objawia się przede wszystkim w sieciach o mniejszej liczbie neuronów a także w sieciach w których występuje wysoka dysproporcja liczby neuronów między wartstwą pierwszą oraz drugą.
+Reguła ta nie jest jednak stała, i objawia się przede wszystkim w sieciach o mniejszej liczbie neuronów a także w~sieciach w których występuje wysoka dysproporcja liczby neuronów między wartstwą pierwszą oraz drugą.
 Przykład alternatywnego trendu widzimy na wykresie \ref{Fig:Er3}.
 
 \begin{figure}[ht]
@@ -1703,7 +1725,7 @@ Przykład alternatywnego trendu widzimy na wykresie \ref{Fig:Er3}.
 Sieci takie cechowały się przede wszystkim ogólnie gorszą średnią poprawnością klasyfikacji, rzadko osiągającą ponad 85\%.
 W ich przypadku, najlepszą efektywność uzyskiwano przy niskich wartościach współczynnika błędu granicznego.
 Podobnie jak wnioskowano na podstawie wykresów zależności poprawności klasyfikacji od współczynników adaptacyjnych,
-również w tym przypadku widzimy że najlepszą efektywność w przypadku takich sieci uzyskuje się dla wartości er bliskich 1.05.
+również w tym przypadku widzimy że najlepszą efektywność w~przypadku takich sieci uzyskuje się dla wartości er bliskich 1.05.
 
 \clearpage
 
@@ -1718,7 +1740,7 @@ Wprowadzone zmiany to:
 	\item Przyjęcie wartości współczynników z nisko efektywnych zakresów
 \end{itemize}
 
-Do przeprowadzenia eksperymentów wkorzystano kod przedstawiony na listingu \ref{lst:test3}
+Do przeprowadzenia eksperymentów wkorzystano kod przedstawiony na listingu~\ref{lst:test3}
 \begin{lstlisting}[language=Rust,caption=Kod wykorzystany do przeprowadzenia 3 serii eksperymentów,label={lst:test3}]
 	fn main() {
     //Vector for learning data
@@ -1927,10 +1949,10 @@ Wrażenie to jest jednak mylne, co widzimy na wykresie \ref{Fig:Retarded1}.
 \end{figure}
 Co istotne, widzimy dużo mniejszą rozdzielczość wartości metaparametrów dla których testowano sieć.
 Jest to spowodowane drastycznym spadkiem wydajności procesu uczenia takiej sieci.
-Spadek ten jest na tyle drastyczny że pomimo redukcji liczby testów do zaledwie kilkunastu tysięcy, podobniej jak w seriach 4 oraz 5, proces uczenia przy maksymalnej liczbie epok równej 10000 i względnie wysokim błędzie docelowym równym $0.25/\text{len}(\text{dataset})$ trwał około 30 godzin.
+Spadek ten jest na tyle drastyczny że pomimo redukcji liczby testów do zaledwie kilkunastu tysięcy, podobnie jak w seriach 4 oraz 5, proces uczenia przy maksymalnej liczbie epok równej 10000 i względnie wysokim błędzie docelowym równym $0.25/\text{len}(\text{dataset})$ trwał około 30 godzin.
 W przypadku eksperymentów serii 4 oraz 5, w których badano większą liczbę sieci lecz przy tych samych parametrach startowych wynosił on nie więcej niż 5 godzin, zaś w seriach 2 oraz 3 w których badano znacznie więcej sieci, lecz przy niższym limicie epok, wynosił około 8 godzin.
 
-Dysproporcje czasowe występukjące w przypadku tej serii eksperymentów były na tyle znaczące że zdecydowano się na wykonanie pojedynczych eksperymentów z bardziej szczegółowym raportem, pozwalających na bardziej dokładne zbadanie zachowania sieci.
+Dysproporcje czasowe występujące w przypadku tej serii eksperymentów były na tyle znaczące że zdecydowano się na wykonanie pojedynczych eksperymentów z~bardziej szczegółowym raportem, pozwalających na bardziej dokładne zbadanie zachowania sieci.
 W celu przeprowadzenia dodatkowego eksperymentu przyjęto parametry przedstawione na listingu \ref{lst:Retarded1}.
 
 \begin{lstlisting}[language=Rust,caption=Kod wykorzystany do przeprowadzenia dodatkowego eksperymentu w serii 6,label={lst:Retarded1}]
@@ -2117,7 +2139,7 @@ Analiza wyników eksperymentów wskazuje natomiast na interesujące zachowanie s
 Możemy np. zauważyć bardzo dobrą poprawność klasyfikacji w sieciach jednowarstwowych.
 Jak wspomniano przy okazji opisu eksperymentu, oznacza to że prawdopodobnie zbiór zwierząt w ZOO na którym prowadzono eksperymenty jest liniowo separowalny, a zatem proces uczenia bardziej złożonych sieci tym bardziej nie powinien sprawiać problemów.
 Co ważne jednak, sieci 3-warstwowe o dużej dysproporcji w liczbie neuronów między warstwami pierwszą oraz drugą miały silnie negatywny wpływ na efektywność uczenia.
-Dużo skuteczniejsze było utworzenie np. sieci 2-warstwowej z 14 neuronami w warstwie pierwszej, niż sieci 3-warstwowej z 1 neuronem w warstwie pierwszej i 13 neuronami w warstwie drugiej
+Dużo skuteczniejsze było utworzenie np. sieci 2-warstwowej z~14~neuronami w warstwie pierwszej, niż sieci 3-warstwowej z 1 neuronem w warstwie pierwszej i 13 neuronami w warstwie drugiej
 
 Zauważono także istotny wpływ modyfikatorów oraz błedu granicznego dla adaptacyjnego współczynnika uczenia.
 Modyfikatory lr\_dec oraz lr\_inc powodowały największy przyrost efektywności uczenia dla niespodziewanie wysokich wartości oscylujących w granicach odchylenia $\approx$0.4 względem jedności.
@@ -2130,6 +2152,8 @@ W spodziewanym zakresie znalazła się natomiast najoptymalniejsza wartość wsp
 \addcontentsline{toc}{section}{Literatura}
 
 \begin{thebibliography}{4}
+	\bibitem{dataset} https://archive.ics.uci.edu/ml/datasets/zoo (Dostęp 19.06.2022r.)
+	\bibitem{kiaNeuron} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw6-model-neuronu.pdf (Dostęp 19.06.2022r.)
 	\bibitem{kiaMultiLayer} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw9-siec-wielowarstw.pdf (Dostęp 05.06.2022r.)
 	\bibitem{kiaSingleLayer} http://materialy.prz-rzeszow.pl/pracownik/pliki/34/sztuczna-inteligencja-cw8-siec-jednowarstw.pdf (Dostęp 05.06.2022r.)
 	\bibitem{nndl} Nielsen M.: Neural Networks and Deep Learning. http://neuralnetworksanddeeplearning.com/ (Dostęp. 05.06.2022r.)

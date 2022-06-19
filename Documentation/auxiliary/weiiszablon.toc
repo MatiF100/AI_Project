@@ -1,4 +1,4 @@
-\babel@toc {polish}{}
+\babel@toc {polish}{}\relax 
 \contentsline {section}{\numberline {1}Opis projektu}{\footnotesize 5}{section.1}%
 \contentsline {subsection}{\numberline {1.1}Cel projektu}{\footnotesize 5}{subsection.1.1}%
 \contentsline {subsection}{\numberline {1.2}Opis i przygotowanie wykorzystanych danych}{\footnotesize 5}{subsection.1.2}%
@@ -21,12 +21,12 @@
 \contentsline {subsection}{\numberline {4.2}Seria 2 - Badanie wpływu metaparametrów sieci na przebieg oraz wynik procesu uczenia}{\footnotesize 36}{subsection.4.2}%
 \contentsline {subsubsection}{\numberline {4.2.1}Wpływ liczby neuronów na efektywność uczenia}{\footnotesize 38}{subsubsection.4.2.1}%
 \contentsline {subsubsection}{\numberline {4.2.2}Wpływ modyfikatorów współczynnika uczenia na poprawność klasyfikacji}{\footnotesize 40}{subsubsection.4.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.3}Wpływ początkowej wartości współczynnika uczenia na proces uczenia}{\footnotesize 46}{subsubsection.4.2.3}%
-\contentsline {subsection}{\numberline {4.3}Seria 3 - Badanie wpływu parametru błędu granicznego na przebieg oraz wynik procesu uczenia}{\footnotesize 48}{subsection.4.3}%
-\contentsline {subsubsection}{\numberline {4.3.1}Wpływ zmiennego współczynnika granicznego na poprawność klasyfikacji przy zmiennej liczbie neuronów}{\footnotesize 51}{subsubsection.4.3.1}%
-\contentsline {subsubsection}{\numberline {4.3.2}Ogólny wpływ parametrów adaptacyjnych na efektywność uczenia sieci}{\footnotesize 54}{subsubsection.4.3.2}%
-\contentsline {subsubsection}{\numberline {4.3.3}Uogólniony wpływ współczynnika błędu granicznego na poprawność klasyfikacji}{\footnotesize 58}{subsubsection.4.3.3}%
-\contentsline {subsection}{\numberline {4.4}Seria 4 oraz seria 5 - Testy metody stochastycznej}{\footnotesize 61}{subsection.4.4}%
-\contentsline {subsection}{\numberline {4.5}Seria 6 - testy osłabionego algorytmu adaptacyjnego}{\footnotesize 66}{subsection.4.5}%
-\contentsline {section}{\numberline {5}Podsumowanie projektu. Wnioski}{\footnotesize 73}{section.5}%
-\contentsline {section}{Literatura}{\footnotesize 75}{section.5}%
+\contentsline {subsubsection}{\numberline {4.2.3}Wpływ początkowej wartości współczynnika uczenia na proces uczenia}{\footnotesize 47}{subsubsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.3}Seria 3 - Badanie wpływu parametru błędu granicznego na przebieg oraz wynik procesu uczenia}{\footnotesize 49}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Wpływ zmiennego współczynnika granicznego na poprawność klasyfikacji przy zmiennej liczbie neuronów}{\footnotesize 52}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Ogólny wpływ parametrów adaptacyjnych na efektywność uczenia sieci}{\footnotesize 55}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}Uogólniony wpływ współczynnika błędu granicznego na poprawność klasyfikacji}{\footnotesize 59}{subsubsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.4}Seria 4 oraz seria 5 - Testy metody stochastycznej}{\footnotesize 62}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Seria 6 - testy osłabionego algorytmu adaptacyjnego}{\footnotesize 67}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Podsumowanie projektu. Wnioski}{\footnotesize 74}{section.5}%
+\contentsline {section}{Literatura}{\footnotesize 76}{section.5}%

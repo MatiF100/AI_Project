@@ -100,7 +100,7 @@ impl Network {
             // Calculating error for each training pair (quadratic cost)
             .map(|v| (v.0 - v.1).fold(0.0, |_, val| val.powf(2.0)) / 2.0)
             // Calculating Mean Squared Error - average squared cost over all training pairs
-            //.map(|e| e.powf(2.0))
+            .map(|e| e.powf(2.0))
             .sum::<f64>()
             / training_data.len() as f64
     }
