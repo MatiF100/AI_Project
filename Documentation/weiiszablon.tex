@@ -14,6 +14,7 @@
 \usepackage{hyperref}
 
 \author{Mateusz Fesz}
+\renewcommand\lstlistlistingname{Spis listingów}
 
 % np. EF-123456, EN-654321, ...
 \studentID{EF-167788}
@@ -51,7 +52,6 @@
 \tableofcontents
 
 \clearpage
-\blankpage
 
 \section{Opis projektu}
 \subsection{Cel projektu}
@@ -155,9 +155,9 @@ W procesie uczenia istotna będzie także wartość pochodnej tej funkcji w dany
 W przypadku funkcji sigmoidalnej można ją sprowadzić do następującej postaci:
 \begin{equation}
 	\label{eq:sigmoidPrime}
-	f'(z) = f(z) * 1-f(z)
+	f'(z) = f(z) \cdot \left(1-f\left(z\right)\right)
 \end{equation}
-Co istotne, argumentami tej funkcji są stałe oraz wyliczona wcześniej pochodna w punkcie.
+Co istotne, argumentem tej funkcji jest wyliczona wcześniej pochodna w punkcie.
 Właściwość ta może być użyta do zmniejszenia liczby wykonywanych przez algorytm operacji.
 
 
@@ -185,7 +185,7 @@ $$\bm{w} = \left[
 	\end{array}
 	\right]$$
 
-Przy założeniu że każdy neuron realizuje tą samą funkcję aktywacji, działanie sieci jednowartwowej wielowarstwowej możemy wyrazić w postaci macierzowej:
+Przy założeniu że każdy neuron realizuje tą samą funkcję aktywacji, działanie sieci jednowartwowej możemy wyrazić w postaci macierzowej:
 \begin{equation}
 	\label{eq:singleLayerOut}
 	a = f\left( wx + b \right)
@@ -220,17 +220,21 @@ Następnie, wykorzystując równania \ref{eq:tripleLayerOut}, możemy opisać dz
 
 \subsection{Proces uczenia sieci z wykorzystaniem metody gradientowej}
 Celem określenia sposobu uczenia sieci, koniecznym jest uprzednie zdefiniowanie tego, co oznacza określenie sieci ,,nauczoną'' bądź ,,nienauczoną''.
-W tym celu definiujemy tzw. funkcję kosztu, określającą poziom rozbieżności pomiędzy wartością otrzymaną na wyjściu sieci, a wartością oczekiwaną.
-Przykładem takiej funkcji, jest funkcja błędu średniokwadratowego (MSE):
+W tym celu definiujemy tzw. funkcję błędu, określającą poziom rozbieżności pomiędzy wartością otrzymaną na wyjściu sieci, a wartością oczekiwaną.
+Przykładem takiej funkcji\cite{kiaSingleLayer}, jest funkcja błędu średniokwadratowego dla danej pary uczącej:
+\begin{equation}
+	E(w, b, x, a) = \frac{1}{2}\sum_{j=1}^{K}(y(x) - a(x))^2_j
+\end{equation}
+Wyznaczenie błędu dla pojedynczej pary uczącej pozwala na zdefiniowanie również funkcji błędu średniokwadratowego dla pełnego zbioru uczącego\cite{nndl}, co przedstawia równanie \ref{eq:costFunction}.
 \begin{equation}
 	\label{eq:costFunction}
-	C\left( w, b, x, a\right) = \frac{1}{2n} \sum\limits_{x} || y\left( x \right) - a ||^2
+	C\left( w, b, X, a\right) = \frac{1}{n} \sum\limits_{i = 1}^{|X|} E(X_i)^2
 \end{equation}
 
-W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$ wszystkich jej biasów, $x$ zbiór danych wejściowych, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór uzyskanych wyjść z sieci.
-Zakładając, że w procesie uczenia wartości $x$ oraz $a$ pozostają stałe, możemy uprościć oznaczenie funkcji do postaci $C (w,b)$.
-Funkcja ta dąży do 0 gdy wartości otrzymywane na wyjściu sieci są bliskie wartościom oczekiwanym, i rośnie wraz ze wzrostem różnicy pomiędzy nimi.
-W związku z powyższym, należy znaleźć taką metodę, która pozwoli na minimalizację wartości funkcji $C(w,b)$.
+W powyższym równaniu, $w$ określa zbiór wszystkich wag wewnątrz sieci, $b$ wszystkich jej biasów, $X$ zbiór wszystkich zestawów wejściowych, $x$ pojedynczy zestaw wejść sieci, $n$ ilość danych wejściowych, $y(x)$ zbiór oczekiwanych danych wyjściowych, natomiast $a$ zbiór uzyskanych wyjść z sieci.
+Zakładając, że w procesie uczenia wartości $X$ pozostają stałe natomiast wartości $a$ są uzależnione od $X$, $w$ oraz $b$, możemy uprościć oznaczenie funkcji do postaci $C (w,b)$ oraz $E(w, b, x)$.
+Funkcje te są ze sobą powiązane i dążą do 0 gdy wartości otrzymywane na wyjściu sieci są bliskie wartościom oczekiwanym, i rośnie wraz ze wzrostem różnicy pomiędzy nimi.
+W związku z powyższym, należy znaleźć taką metodę, która pozwoli na minimalizację wartości funkcji $E(w, b, x)$ oraz $C(w,b)$.
 
 \subsubsection{Ogólny algorytm gradientowy}
 Celem zobrazowania problemu rozważmy prostą funkcję $C(v_1, v_2)$ zobrazowaną na rysunku \ref{Fig:simpleCost}.
@@ -285,7 +289,7 @@ W tej postaci równania widzimy, że dla odpowiednio niskiego współczynnika $\
 Wykorzystując właściwość opisaną równaniem \ref{eq:lrNabla} możemy wyznaczyć nowe wartości zmiennych zawartych w wektorze $v$:
 \begin{equation}
 	\begin{aligned}
-		v  \rightarrow v' &= v - \eta \nabla C \\
+		v' &= v - \eta \nabla C \\
 		v' &= v + \Delta v
 	\end{aligned}
 \end{equation}
@@ -299,22 +303,71 @@ Algorytm gradientowy może zostać wykorzystany do minimalizacji funkcji przedst
 Wykorzystując oznaczenia $w^{(l)}_{ij}$ jako j-tą wagę i-tego neuronu l-tej warstwy oraz $b^{(l)}_i$ jako bias i-tego neuronu w l-tej warstwie, możemy wyznaczyć ich wartości w kolejnych iteracjach (epokach) procesu uczenia:
 \begin{equation}
 	\label{eq:weightUpdate}
-	w^{(l)}_{ij} \rightarrow {w'}^{(l)}_{ij} = w^{(l)}_{ij} - \eta \frac{\delta C}{\delta w^{(l)}_{ij}}
+	{w'}^{(l)}_{ij} = w^{(l)}_{ij} - \eta \frac{\partial E}{\partial w^{(l)}_{ij}}
 \end{equation}
 \begin{equation}
 	\label{eq:biasUpdate}
-	b^{(l)}_{i} \rightarrow {b'}^{(l)}_{i} = b^{(l)}_{i} - \eta \frac{\delta C}{\delta b^{(l)}_{i}}
+	 {b'}^{(l)}_{i} = b^{(l)}_{i} - \eta \frac{\partial E}{\partial b^{(l)}_{i}}
 \end{equation}
 
 Przyjmując jako funkcję kosztu błąd średniokwadratowy, przy założeniu wystąpienia wielu danych uczących, możemy ją zapisać w postaci:
 \begin{equation}
-	C = \frac{1}{n} \sum \limits_x C_x
+	C = \frac{1}{|X|} \sum_{i=1}^{|X|} E(w, b, X_i)^2
 \end{equation}
-czyli średniej wartości błędów $C_{x} = \frac{||y(x) - a||^2}{2}$ dla poszczególnych par uczących.
 
-TODO: Rozpisać wzory na poszczególne pochodne - instrukcja \cite{kiaMultiLayer}
+Ogólne wzory na pochodne dla warstw 1-3 wymagane przez równania \ref{eq:weightUpdate} oraz \ref{eq:biasUpdate} przedstawiono poniżej.\cite{kiaMultiLayer}
 
+\begin{equation}
+	\frac{\partial E}{\partial w_{i_3 i_2}^{(3)}} =
+	\frac{\partial E}{\partial f^{(3)}}
+	\frac{\partial f^{(3)} \left( z_{i_3}^{(3)} \right)}{\partial z_{i_3}^{(3)}}
+	\frac{\partial z_{i_3}^{(3)} }{\partial w_{i_3 i_2}^{(3)}}
+	=
+	\left(a_{i_3} - y_{i_3} \right)
+	\frac{\partial f^{(3)} \left( z_{i_3}^{(3)} \right)}{\partial z_{i_3}^{(3)}}
+	a_{i_2}^{(2)}
+\end{equation}
 
+\begin{equation}
+	\begin{aligned}
+		\frac{\partial E}{\partial w_{i_2 i_1}^{(2)}} &=
+		\frac{\partial E}{\partial f^{(3)}}
+		\frac{\partial f^{(3)} \left( z_{i_3}^{(3)} \right)}{\partial z_{i_3}^{(3)}}
+		\frac{\partial z_{i_3}^{(3)} }{\partial f^{(2)}}
+		\frac{\partial f^{(2)} \left( z_{i_2}^{(2)} \right)}{\partial z_{i_2}^{(2)}}
+		\frac{\partial z_{i_2}^{(2)} }{\partial w_{i_2 i_1}^{(2)}}
+		\\&=
+		\sum_{i_3 = 1}^{K_3}
+		\left(a_{i_3} - y_{i_3} \right)
+		\frac{\partial f^{(3)} \left( z_{i_3}^{(3)} \right)}{\partial z_{i_3}^{(3)}}
+		w_{i_3 i_2}^{(3)}
+		\frac{\partial f^{(2)} \left( z_{i_2}^{(2)} \right)}{\partial z_{i_2}^{(2)}}
+		a_{i_1}^{(1)}
+	\end{aligned}
+\end{equation}
+
+\begin{equation}
+	\begin{aligned}
+		\frac{\partial E}{\partial w_{i_1 j}^{(1)}} &=
+		\frac{\partial E}{\partial f^{(3)}}
+		\frac{\partial f^{(3)} \left( z_{i_3}^{(3)} \right)}{\partial z_{i_3}^{(3)}}
+		\frac{\partial z_{i_3}^{(3)} }{\partial f^{(2)}}
+		\frac{\partial f^{(2)} \left( z_{i_2}^{(2)} \right)}{\partial z_{i_2}^{(2)}}
+		\frac{\partial z_{i_2}^{(2)} }{\partial f^{(1)}}
+		\frac{\partial f^{(1)} \left( z_{i_1}^{(1)} \right)}{\partial z_{i_1}^{(1)}}
+		\frac{\partial z_{i_1}^{(1)} }{\partial w_{i_1 j}^{(1)}}
+		\\&=
+		\sum_{i_3 = 1}^{K_3}
+		\left(a_{i_3} - y_{i_3} \right)
+		\frac{\partial f^{(3)} \left( z_{i_3}^{(3)} \right)}{\partial z_{i_3}^{(3)}}
+		\sum_{i_2 = 1}^{K_2}
+		w_{i_3 i_2}^{(3)}
+		\frac{\partial f^{(2)} \left( z_{i_2}^{(2)} \right)}{\partial z_{i_2}^{(2)}}
+		w_{i_2 i_1}^{(2)}
+		\frac{\partial f^{(1)} \left( z_{i_1}^{(1)} \right)}{\partial z_{i_1}^{(1)}}
+		x_j
+	\end{aligned}
+\end{equation}
 
 \subsubsection{Metoda stochastycznego spadku gradientu}
 Jednym z problemów algorytmu spadku gradientu, objawiającym się przy dużej liczbie rekordów uczących \cite{nndl} jest długi czas potrzebny na obliczanie wartości pochodnych w równaniu \ref{eq:gradientVector}.
@@ -370,6 +423,7 @@ Polega on na dodatkowym zapisywaniu stanu wag oraz biasów przed ich zmianą wyn
 Wagi te mogą następnie zostać przywrócone jeśli uczenie przyniosło efekt odwrotny do zamierzonego i doszło do wzrostu wartości błędu.
 W praktyce oznacza to przywrócenie zachowanych wag oraz biasów w momencie zmniejszenia $\eta$ o współczynnik \xi_d.
 
+\clearpage
 \section{Implementacja algorytmów w języku Rust}
 Przed wykonaniem badań operujących na przedstawionych algorytmach, konieczna była ich implementacja w postaci pozwalającej na proste ustalanie parametrów sieci, oraz jej ewentualne modyfikacje na potrzeby eksperymentów.
 W tym celu wykorzystany został język programowania ogólnego przeznaczenia - Rust, oraz następujące biblioteki:
@@ -999,7 +1053,7 @@ impl Animal {
 Struktura Animal przedstawiona na listingu \ref{lst:loadData} pozwala na przechowanie rekordów uczących w postaci obiektów, co ułatwia dalszą manipulację nimi.
 Powiązane z nią funkcje pozwalają na utworzenie nowej listy zwierząt na bazie danych odczytanych z pliku oraz jej konwersję do formatu wymaganego przez sieć neuronową zaprezentowaną na listingu \ref{lst:netStructure}.
 
-
+\clearpage
 \section{Eksperymenty}
 Eksperymenty którym poddawane były sieci, miały na celu zbadanie poprawności implementacji algorytmów, a także późniejsze badania ich wydajności oraz wpływu szeregu zmiennych na proces uczenia.
 Celem przygotowania struktury sieci do eksperymentów, zmodyfikowane zostały jej elementy mogące wpływać niekorzystnie na powtarzalność wyników.
@@ -1653,7 +1707,7 @@ również w tym przypadku widzimy że najlepszą efektywność w przypadku takic
 
 \clearpage
 
-\subsubsection{Seria 4 oraz seria 5 - Testy metody stochastycznej}
+\subsection{Seria 4 oraz seria 5 - Testy metody stochastycznej}
 Celem tej serii eksperymentów była weryfikacja korzyści płynących z zastosowania metody stochastycznej.
 W celu zapewnienia lepszych możliwości porównawczych wykonano pewne modyfikacje względem eksperymentów z poprzednich serii, co wymusiło również wykonanie niestochastycznej próby kontrolnej.
 Wprowadzone zmiany to:
@@ -2041,6 +2095,38 @@ Duża liczba epok nie przełożyła się jednak na lepsze wyniki poprawności kl
 Przy walidacji krzyżowej, sieć uczona osłabionym algorytmem osiągnęła śrendnio  jednie 43\% poprawności klasyfikacji, co potwierdza wysunięte na podstawie wykresów wnioski o gorszej efektywności takiego sposobu uczenia.
 
 \clearpage
+
+\section{Podsumowanie projektu. Wnioski}
+Wykonany projekt pozwolił na zapoznanie się ze sposobem działania prostych sieci neuronowych typu feed-forward oraz ich uczenia metodą  wstecznej propagacji błędu.
+Przeprowadzone w jego ramach eksperymenty zaprezentowały wpływ różnych parametrów procesu uczenia na ostateczną efektywność sieci.
+Istotnym zjawiskiem zaobserwowanym w trakcie badań była wysoka podatność procesu uczenia na początkowy stan macierzy wag oraz biasów.
+Jednym z eksperymentów które możnaby przeprowadzić w dalszym etapie byłoby zbadanie innych sposobów wstępnej inicjalizacji sieci.
+Podobnie, pomiędzy częścią eksperymentów zauważono duże różnice w czasie potrzebnym na ich wykonanie.
+W związku z tym warte sprawdzenia byłby także liczba epok potrzebnych do osiągnięcia zadanej wartości błędu czy też czas poświęcany na pojedynczą epokę.
+Wyraźnych różnic czasowych możnaby spodziewać się w szczególności przy porównaniu metody spadku gradientu przy wykorzystaniu adaptacyjnego współczynnika uczenia z metodą klasyczną.
+
+Wykonanie własnej implementacji algorytmów sieci oraz jej uczenia pozwoliło na dokładne zgłębienie sposobu ich działania.
+Wymusiło ono także konieczność sięgnięcia do różnych źródeł celem zapoznania się ze szczegółami działania tychże algorytmów.
+W trakcie prac wystąpiły pomniejsze problemy, m.in. podczas implementacji adaptacyjnego współczynnika uczenia, lecz nie były one na tyle poważne aby całkowicie uniemożliwić dalszą pracę.
+Co więcej, aktualna implementacja algorytmów w kodzie jest daleka od optymalnej.
+Duża część obliczeń jest wykonywana nadmiarowo, a zatem pozostawia wyraźne pole do optymalizacji
+W szczególności wykorzystanie obliczonych w trakcie procesu uczenia aktywacji poszczególnych neuronów w późniejszym obliczaniu pochodnych funkcji na potrzeby algorytmu propagacji wstecznej.
+Wykonane przy użyciu narzędzia flamegraph profilowanie kodu wskazuje że jest to jeden z krytycznych punktów pod względem wydajności, a zatem jego przyspieszenie mogłoby w znacznym stopniu poprawić wydajność implementacji.
+
+Analiza wyników eksperymentów wskazuje natomiast na interesujące zachowanie sieci.
+Możemy np. zauważyć bardzo dobrą poprawność klasyfikacji w sieciach jednowarstwowych.
+Jak wspomniano przy okazji opisu eksperymentu, oznacza to że prawdopodobnie zbiór zwierząt w ZOO na którym prowadzono eksperymenty jest liniowo separowalny, a zatem proces uczenia bardziej złożonych sieci tym bardziej nie powinien sprawiać problemów.
+Co ważne jednak, sieci 3-warstwowe o dużej dysproporcji w liczbie neuronów między warstwami pierwszą oraz drugą miały silnie negatywny wpływ na efektywność uczenia.
+Dużo skuteczniejsze było utworzenie np. sieci 2-warstwowej z 14 neuronami w warstwie pierwszej, niż sieci 3-warstwowej z 1 neuronem w warstwie pierwszej i 13 neuronami w warstwie drugiej
+
+Zauważono także istotny wpływ modyfikatorów oraz błedu granicznego dla adaptacyjnego współczynnika uczenia.
+Modyfikatory lr\_dec oraz lr\_inc powodowały największy przyrost efektywności uczenia dla niespodziewanie wysokich wartości oscylujących w granicach odchylenia $\approx$0.4 względem jedności.
+W spodziewanym zakresie znalazła się natomiast najoptymalniejsza wartość współczynnika błędu granicznego er, która wyniosła $\approx$1.04, które jest wartością domyślną w środowisku MATLAB.
+
+
+
+\clearpage
+
 \addcontentsline{toc}{section}{Literatura}
 
 \begin{thebibliography}{4}
@@ -2052,6 +2138,9 @@ Przy walidacji krzyżowej, sieć uczona osłabionym algorytmem osiągnęła śre
 \end{thebibliography}
 
 \clearpage
+\listoffigures
+\clearpage
+\lstlistoflistings
 
 
 \end{document} 

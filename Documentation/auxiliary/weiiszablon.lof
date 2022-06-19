@@ -1,0 +1,29 @@
+\babel@toc {polish}{}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Graficzny model neuronu}}{\footnotesize 7}{figure.1}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Model prostej sieci jednowarstwowej}}{\footnotesize 9}{figure.2}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Model prostej sieci trójwarstwowej}}{\footnotesize 10}{figure.3}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Przykładowa funkcja 2 zmiennych}}{\footnotesize 12}{figure.4}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Wykres zależności poprawności klasyfikacji od S1 oraz S2 przy lr = 0.2, lr\_inc = 1.05, lr\_dec = 0.9}}{\footnotesize 38}{figure.5}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Wykres zależności poprawności klasyfikacji od S1 oraz S2 przy lr = 0.0001, lr\_inc = 1.25, lr\_dec = 0.93}}{\footnotesize 39}{figure.6}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Wykres zależności poprawności klasyfikacji od modyfikatorów lr, przy lr~=~0.7 dla sieci jednowarstwowej}}{\footnotesize 40}{figure.7}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Wykres zależności poprawności klasyfikacji od modyfikatorów lr, przy lr~=~0.7 dla sieci dwuwarstwowej przy S1 = 3}}{\footnotesize 41}{figure.8}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Wykres zależności poprawności klasyfikacji od modyfikatorów lr, przy lr~=~0.96 dla sieci dwuwarstwowej przy S1 = 14}}{\footnotesize 42}{figure.9}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Płaski wykres występujący przy niskim początkowym współczynniku uczenia}}{\footnotesize 43}{figure.10}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Zależność poprawności klasyfikacji od parametrów adaptacyjnych przy lr~=~0.2, S1~=~3 oraz S2~=~10}}{\footnotesize 44}{figure.11}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Zależność poprawności klasyfikacji od parametrów adaptacyjnych przy lr~=~0.2, S1~=~11 oraz S2~=~5}}{\footnotesize 45}{figure.12}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Średnia poprawność klasyfikacji przy S1~=~4, S2~=~7 (wykres górny) oraz S1~=~S2~=~6 (wykres dolny)}}{\footnotesize 47}{figure.13}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Poprawność klasyfikacji przy er~=~1, lr\_dec~=~0.8 oraz lr\_inc~=~1.25}}{\footnotesize 51}{figure.14}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Poprawność klasyfikacji przy er~=~1.01, lr\_dec~=~0.8 oraz lr\_inc~=~1.25}}{\footnotesize 52}{figure.15}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Poprawność klasyfikacji przy er~=~1.15, lr\_dec~=~0.8 oraz lr\_inc~=~1.25}}{\footnotesize 53}{figure.16}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1, S1~=~3 oraz S2~=~10}}{\footnotesize 54}{figure.17}%
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1.01, S1~=~3 oraz S2~=~10}}{\footnotesize 55}{figure.18}%
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1.04, S1~=~3 oraz S2~=~10}}{\footnotesize 56}{figure.19}%
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Poprawność klasyfikacji dla sieci trójwarstwowej przy er~=~1.5, S1~=~3 oraz S2~=~10}}{\footnotesize 57}{figure.20}%
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Średnia poprawność klasyfikacji sieci 2-warstwowej przy 13 neuronach w warstwie pierwszej}}{\footnotesize 58}{figure.21}%
+\contentsline {figure}{\numberline {4.22}{\ignorespaces Średnia poprawność klasyfikacji sieci 3-warstwowej przy S1~=~5 oraz S2~=~10}}{\footnotesize 59}{figure.22}%
+\contentsline {figure}{\numberline {4.23}{\ignorespaces Średnia poprawność klasyfikacji sieci 3-warstwowej przy S1~=~11 oraz S2~=~3}}{\footnotesize 60}{figure.23}%
+\contentsline {figure}{\numberline {4.24}{\ignorespaces Poprawność klasyfikacji sieci 3-warstwowej przy er~=~1.07 S1~=~4 oraz S2~=~10}}{\footnotesize 64}{figure.24}%
+\contentsline {figure}{\numberline {4.25}{\ignorespaces Poprawność klasyfikacji sieci 3-warstwowej uczonej metodą stochastyczną przy er~=~1.07 S1~=~4 oraz S2~=~10}}{\footnotesize 65}{figure.25}%
+\contentsline {figure}{\numberline {4.26}{\ignorespaces Poprawność klasyfikacji sieci 3-warstwowej uczonej przy przy er~=~1.07 S1~=~4 oraz S2~=~10}}{\footnotesize 67}{figure.26}%
+\contentsline {figure}{\numberline {4.27}{\ignorespaces Poprawność klasyfikacji sieci uczonej standardowym algorytmem przy er~=~1.07 S1~=~4 oraz S2~=~10}}{\footnotesize 71}{figure.27}%
+\contentsline {figure}{\numberline {4.28}{\ignorespaces Poprawność klasyfikacji sieci uczonej osłabionym algorytmem przy er~=~1.07 S1~=~4 oraz S2~=~10}}{\footnotesize 72}{figure.28}%
