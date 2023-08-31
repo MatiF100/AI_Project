@@ -408,7 +408,6 @@ fn main() {
     //dbg!(&x);
     //dbg!(x.backprop(&Array2::<f64>::zeros((2, 1)), &Array2::<f64>::zeros((4, 1))));
 
-    /*
     //Vector for learning data
     let t_data: Vec<(Array2<f64>, Array2<f64>)>;
     //Vector for validation data
@@ -460,7 +459,7 @@ fn main() {
     ];
 
     let threads = std::sync::Arc::new(std::sync::Mutex::new(0));
-    let (sync_tx, sync_rx) = mpsc::sync_channel(4);
+    let (sync_tx, sync_rx) = mpsc::sync_channel(12);
     let (tx, rx) = mpsc::channel();
 
     let tmp_threads = threads.clone();
@@ -520,7 +519,6 @@ fn main() {
             break;
         }
     }
-    */
     /*
     x.sgd(
         &mut t_data,
